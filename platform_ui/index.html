@@ -545,16 +545,15 @@ footer {
 <section class="hero">
   <div class="hero-eyebrow">
     <span class="hero-eyebrow-dot"></span>
-    Cross-Repository Defect Intelligence · Calibrated Probabilities · 0.8971 PR-AUC
+    Enterprise Defect Intelligence · Real-Time Collaborative Analysis
   </div>
 
   <h1>
     <span class="grad">AI-Powered Defect<br>Intelligence</span><br>
-    for Python Codebases
+    for Modern Codebases
   </h1>
   <p class="hero-sub">
-    Cross-repository bug-fix risk prediction using causal quantile-rank normalisation,
-    code smell persistence, and behavioral feature engineering — validated across 48 open-source repositories.
+    Proactive architectural smell detection, maintainability index evaluation, and real-time defect risk analysis across your repositories.
   </p>
 
   <div class="hero-actions">
@@ -568,77 +567,27 @@ footer {
     </a>
   </div>
 
-  <!-- Animated score rings -->
-  <div class="hero-visual reveal">
-    <div class="score-ring-wrap">
-      <div style="text-align:center">
-        <div class="score-ring">
-          <svg viewBox="0 0 136 136">
-            <circle class="score-track" cx="68" cy="68" r="60"/>
-            <circle id="ring-lopo" class="score-fill" cx="68" cy="68" r="60" stroke="url(#rg1)"/>
-            <defs><linearGradient id="rg1" x1="0" y1="0" x2="136" y2="0" gradientUnits="userSpaceOnUse"><stop stop-color="#4f9eff"/><stop offset="1" stop-color="#7c3aed"/></linearGradient></defs>
-          </svg>
-          <div class="score-ring-inner">
-            <div class="score-val" id="lopo-val">0.6582</div>
-            <div class="score-lbl">LOPO PR-AUC</div>
-          </div>
-        </div>
-        <div style="font-size:11px;color:var(--muted);margin-top:8px">48-Repo Cross-Validation</div>
-      </div>
-
-      <div style="text-align:center">
-        <div class="score-ring">
-          <svg viewBox="0 0 136 136">
-            <circle class="score-track" cx="68" cy="68" r="60"/>
-            <circle id="ring-ood" class="score-fill" cx="68" cy="68" r="60" stroke="url(#rg2)"/>
-            <defs><linearGradient id="rg2" x1="0" y1="0" x2="136" y2="0" gradientUnits="userSpaceOnUse"><stop stop-color="#10b981"/><stop offset="1" stop-color="#06b6d4"/></linearGradient></defs>
-          </svg>
-          <div class="score-ring-inner">
-            <div class="score-val" id="ood-val">0.8971</div>
-            <div class="score-lbl">OOD PR-AUC</div>
-          </div>
-        </div>
-        <div style="font-size:11px;color:var(--muted);margin-top:8px">Zero-Shot (django + rich)</div>
-      </div>
-
-      <div style="text-align:center">
-        <div class="score-ring">
-          <svg viewBox="0 0 136 136">
-            <circle class="score-track" cx="68" cy="68" r="60"/>
-            <circle id="ring-noise" class="score-fill" cx="68" cy="68" r="60" stroke="url(#rg3)"/>
-            <defs><linearGradient id="rg3" x1="0" y1="0" x2="136" y2="0" gradientUnits="userSpaceOnUse"><stop stop-color="#f59e0b"/><stop offset="1" stop-color="#ef4444"/></linearGradient></defs>
-          </svg>
-          <div class="score-ring-inner">
-            <div class="score-val" id="noise-val">20.7%</div>
-            <div class="score-lbl">SZZ Noise η</div>
-          </div>
-        </div>
-        <div style="font-size:11px;color:var(--muted);margin-top:8px">Resilient — No Correction Needed</div>
-      </div>
+  <!-- Sleek Feature Pillar Cards -->
+  <div class="feature-pillars-grid reveal" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:16px; width:100%; max-width:1040px; margin-top:40px;">
+    <div style="background:#0f172a; border:1px solid rgba(6, 182, 212, 0.25); padding:20px; border-radius:8px; text-align:left;">
+      <div style="color:#38bdf8; font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:0.05em; margin-bottom:6px;">AST Code Smells</div>
+      <div style="font-size:14px; font-weight:600; color:#f8fafc; margin-bottom:6px;">Structural Defect Detection</div>
+      <div style="font-size:12px; color:#94a3b8; line-height:1.5;">Identifies Long Methods, Deep Nesting, Large Classes, and Long Parameter Lists before commit.</div>
     </div>
-  </div>
-
-  <!-- Stats strip -->
-  <div class="stats-strip reveal">
-    <div class="stat-item">
-      <div class="stat-num" style="color:var(--accent)" id="s-rows">24,398</div>
-      <div class="stat-desc">Commit Snapshots</div>
+    <div style="background:#0f172a; border:1px solid rgba(99, 102, 241, 0.25); padding:20px; border-radius:8px; text-align:left;">
+      <div style="color:#818cf8; font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:0.05em; margin-bottom:6px;">Calibrated ML Prior</div>
+      <div style="font-size:14px; font-weight:600; color:#f8fafc; margin-bottom:6px;">Empirical Defect Risk</div>
+      <div style="font-size:12px; color:#94a3b8; line-height:1.5;">LightGBM / CatBoost model predicting bug-fix probability calibrated against real repositories.</div>
     </div>
-    <div class="stat-item">
-      <div class="stat-num" id="s-repos">50</div>
-      <div class="stat-desc">Open-Source Repos</div>
+    <div style="background:#0f172a; border:1px solid rgba(16, 185, 129, 0.25); padding:20px; border-radius:8px; text-align:left;">
+      <div style="color:#34d399; font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:0.05em; margin-bottom:6px;">Polyglot Engine</div>
+      <div style="font-size:14px; font-weight:600; color:#f8fafc; margin-bottom:6px;">Universal Static Telemetry</div>
+      <div style="font-size:12px; color:#94a3b8; line-height:1.5;">Extracts LOC, Cyclomatic Complexity, and Cognitive Load across Python, Java, JS, TS, Go, and Rust.</div>
     </div>
-    <div class="stat-item">
-      <div class="stat-num" style="color:var(--accent2)">73</div>
-      <div class="stat-desc">Causal Metrics & Features</div>
-    </div>
-    <div class="stat-item">
-      <div class="stat-num" style="color:var(--green)" id="s-pr">0.8971</div>
-      <div class="stat-desc">OOD PR-AUC</div>
-    </div>
-    <div class="stat-item">
-      <div class="stat-num" style="color:var(--amber)" id="s-rate">45.4%</div>
-      <div class="stat-desc">Defect Prevalence</div>
+    <div style="background:#0f172a; border:1px solid rgba(245, 158, 11, 0.25); padding:20px; border-radius:8px; text-align:left;">
+      <div style="color:#fbbf24; font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:0.05em; margin-bottom:6px;">Collaboration</div>
+      <div style="font-size:14px; font-weight:600; color:#f8fafc; margin-bottom:6px;">Real-Time Team Sync</div>
+      <div style="font-size:12px; color:#94a3b8; line-height:1.5;">WebSocket live room relay, synchronized peer editing, and inline code review annotations.</div>
     </div>
   </div>
 </section>
@@ -1295,7 +1244,10 @@ function renderRepoTable(list) {
   if (!tbody) return;
   tbody.innerHTML = list.map(r => `
     <tr style="border-bottom:1px solid rgba(255,255,255,0.04);transition:background 0.15s ease;" onmouseover="this.style.background='var(--elev)'" onmouseout="this.style.background='transparent'">
-      <td style="padding:10px 16px;color:var(--txt);font-weight:600;"><span style="color:var(--purple);margin-right:6px;">📦</span>${r.name}</td>
+      <td style="padding:10px 16px;color:var(--txt);font-weight:600;display:flex;align-items:center;gap:6px;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2" style="width:13px;height:13px;flex-shrink:0;"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+        <span>${r.name}</span>
+      </td>
       <td style="padding:10px 16px;color:var(--txt2);">${r.domain}</td>
       <td style="padding:10px 16px;color:var(--muted);">${r.rows.toLocaleString()}</td>
       <td style="padding:10px 16px;color:var(--muted);">${r.base.toFixed(4)}</td>
