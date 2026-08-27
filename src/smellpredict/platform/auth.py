@@ -371,16 +371,20 @@ async def auth_guest():
     """
     Creates an instant guest session with zero setup.
     """
-    import uuid
-    guest_id = f"dev_{uuid.uuid4().hex[:6]}"
-    avatar = f"https://api.dicebear.com/7.x/bottts/svg?seed={guest_id}"
-    token = issue_jwt(login=guest_id, avatar_url=avatar, github_token="guest_token")
-    return JSONResponse({
-        "username": guest_id,
-        "avatar_url": avatar,
-        "token": token,
-        "is_guest": True,
-    })
+    try:
+        import uuid
+        guest_id = f"dev_{uuid.uuid4().hex[:6]}"
+        avatar = f"https://api.dicebear.com/7.x/bottts/svg?seed={guest_id}"
+        token = issue_jwt(login=guest_id, avatar_url=avatar, github_token="guest_token")
+        return JSONResponse({
+            "username": guest_id,
+            "avatar_url": avatar,
+            "token": token,
+            "is_guest": True,
+        })
+    except Exception as exc:
+        logger.error(f"Guest auth error: {exc}")
+        return JSONResponse({"detail": f"Guest session error: {exc}"}, status_code=500)
 
 
 @router.post("/token", summary="Sign in directly via GitHub Personal Access Token (PAT)")
@@ -388,50 +392,54 @@ async def auth_token(body: dict):
     """
     Allows direct login with a GitHub Personal Access Token (classic or fine-grained).
     """
-    pat = (body.get("token") or "").strip()
-    if not pat:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Token is required.")
-    
-    auth_header = f"Bearer {pat}" if pat.startswith("github_pat_") or pat.startswith("ghp_") else f"token {pat}"
-    headers = {
-        "Authorization": auth_header,
-        "Accept": "application/vnd.github+json",
-        "User-Agent": "SmellPredict-Platform",
-        "X-GitHub-Api-Version": "2022-11-28",
-    }
+    try:
+        pat = (body.get("token") or "").strip()
+        if not pat:
+            return JSONResponse({"detail": "Token is required."}, status_code=400)
+        
+        auth_header = f"Bearer {pat}" if pat.startswith("github_pat_") or pat.startswith("ghp_") else f"token {pat}"
+        headers = {
+            "Authorization": auth_header,
+            "Accept": "application/vnd.github+json",
+            "User-Agent": "SmellPredict-Platform",
+            "X-GitHub-Api-Version": "2022-11-28",
+        }
 
-    login = "github_developer"
-    avatar = "https://github.com/github.png"
+        login = "github_developer"
+        avatar = "https://github.com/github.png"
 
-    async with httpx.AsyncClient(timeout=15) as client:
-        try:
-            resp = await client.get(GITHUB_USER_URL, headers=headers)
-            if resp.status_code == 200:
-                data = resp.json()
-                login = data.get("login", login)
-                avatar = data.get("avatar_url", avatar)
-            else:
-                # Fine-grained tokens may not have user profile scope; verify via repos or rate_limit
-                repo_resp = await client.get("https://api.github.com/user/repos?per_page=1", headers=headers)
-                if repo_resp.status_code == 200:
-                    repos = repo_resp.json()
-                    if isinstance(repos, list) and len(repos) > 0 and "owner" in repos[0]:
-                        login = repos[0]["owner"].get("login", login)
-                        avatar = repos[0]["owner"].get("avatar_url", avatar)
+        async with httpx.AsyncClient(timeout=15) as client:
+            try:
+                resp = await client.get(GITHUB_USER_URL, headers=headers)
+                if resp.status_code == 200:
+                    data = resp.json()
+                    login = data.get("login", login)
+                    avatar = data.get("avatar_url", avatar)
                 else:
-                    rate_resp = await client.get("https://api.github.com/rate_limit", headers=headers)
-                    if rate_resp.status_code != 200:
-                        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid GitHub Personal Access Token. Please verify your token.")
-        except httpx.RequestError as exc:
-            raise HTTPException(status_code=502, detail=f"GitHub connection error: {exc}")
-            
-    token = issue_jwt(login=login, avatar_url=avatar, github_token=pat)
-    return JSONResponse({
-        "username": login,
-        "avatar_url": avatar,
-        "token": token,
-        "is_guest": False,
-    })
+                    # Fine-grained tokens may not have user profile scope; verify via repos or rate_limit
+                    repo_resp = await client.get("https://api.github.com/user/repos?per_page=1", headers=headers)
+                    if repo_resp.status_code == 200:
+                        repos = repo_resp.json()
+                        if isinstance(repos, list) and len(repos) > 0 and "owner" in repos[0]:
+                            login = repos[0]["owner"].get("login", login)
+                            avatar = repos[0]["owner"].get("avatar_url", avatar)
+                    else:
+                        rate_resp = await client.get("https://api.github.com/rate_limit", headers=headers)
+                        if rate_resp.status_code != 200:
+                            return JSONResponse({"detail": "Invalid GitHub Personal Access Token. Please verify token permissions."}, status_code=401)
+            except httpx.RequestError as exc:
+                return JSONResponse({"detail": f"GitHub connection error: {exc}"}, status_code=502)
+                
+        token = issue_jwt(login=login, avatar_url=avatar, github_token=pat)
+        return JSONResponse({
+            "username": login,
+            "avatar_url": avatar,
+            "token": token,
+            "is_guest": False,
+        })
+    except Exception as exc:
+        logger.error(f"Token auth exception: {exc}")
+        return JSONResponse({"detail": f"Authentication failed: {exc}"}, status_code=400)
 
 
 @router.get("/me", summary="Get authenticated user info from JWT")

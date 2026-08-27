@@ -2038,11 +2038,18 @@ async function signInWithPAT() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ token })
     });
-    if (!res.ok) {
-      const err = await res.json();
-      throw new Error(err.detail || 'Invalid token');
+
+    let data;
+    try {
+      data = await res.json();
+    } catch(parseErr) {
+      throw new Error(`Server returned HTTP ${res.status}`);
     }
-    const data = await res.json();
+
+    if (!res.ok) {
+      throw new Error(data.detail || data.message || 'Invalid token');
+    }
+
     jwt = data.token;
     currentUser = { username: data.username, avatar_url: data.avatar_url };
     try {
