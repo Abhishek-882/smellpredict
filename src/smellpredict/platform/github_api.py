@@ -286,3 +286,100 @@ async def commit_file(
         })
     except GithubException as exc:
         _handle_github_error(exc)
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Public Repository Explorer (Zero Authentication Required)
+# ─────────────────────────────────────────────────────────────────────────────
+
+import httpx
+
+@router.get("/public/presets", summary="Get curated open-source repositories for instant exploration")
+async def get_public_presets():
+    return JSONResponse({
+        "presets": [
+            {"name": "pallets/click", "desc": "Composable command line interface toolkit", "lang": "Python"},
+            {"name": "pallets/flask", "desc": "Lightweight WSGI web application framework", "lang": "Python"},
+            {"name": "psf/requests", "desc": "HTTP for Humans — Python library", "lang": "Python"},
+            {"name": "tiangolo/fastapi", "desc": "High performance modern Python API framework", "lang": "Python"},
+            {"name": "Abhishek-882/smellpredict", "desc": "SmellPredict Defect Intelligence platform", "lang": "Python"},
+            {"name": "iluwatar/java-design-patterns", "desc": "Design patterns implemented in Java", "lang": "Java"},
+        ]
+    })
+
+
+@router.get("/public/tree", summary="Fetch file tree for any public GitHub repository")
+async def get_public_tree(repo: str = Query(..., description="Repository in owner/name format or GitHub URL")):
+    """
+    Fetches the public git tree for any GitHub repository without needing login or OAuth tokens.
+    """
+    # Clean repository name from URL if provided
+    clean_repo = repo.strip().replace("https://github.com/", "").rstrip("/")
+    if "/" not in clean_repo:
+        raise HTTPException(status_code=400, detail="Repository must be in owner/repo format.")
+
+    async with httpx.AsyncClient(timeout=15) as client:
+        # 1. Get default branch
+        repo_resp = await client.get(
+            f"https://api.github.com/repos/{clean_repo}",
+            headers={"User-Agent": "SmellPredict-Explorer", "Accept": "application/vnd.github+json"}
+        )
+        if repo_resp.status_code != 200:
+            raise HTTPException(status_code=repo_resp.status_code, detail=f"Could not load GitHub repository '{clean_repo}'. Check if name is correct.")
+        
+        repo_data = repo_resp.json()
+        default_branch = repo_data.get("default_branch", "main")
+        
+        # 2. Get recursive tree
+        tree_resp = await client.get(
+            f"https://api.github.com/repos/{clean_repo}/git/trees/{default_branch}?recursive=1",
+            headers={"User-Agent": "SmellPredict-Explorer", "Accept": "application/vnd.github+json"}
+        )
+        
+        tree_items = []
+        if tree_resp.status_code == 200:
+            raw_tree = tree_resp.json().get("tree", [])
+            for item in raw_tree:
+                if item.get("type") == "blob":
+                    p = item.get("path", "")
+                    ext = p.split(".")[-1].lower() if "." in p else ""
+                    if ext in ["py", "java", "js", "ts", "cpp", "c", "go", "rs", "html", "json", "md", "yaml", "yml"]:
+                        tree_items.append({
+                            "path": p,
+                            "size": item.get("size", 0),
+                            "sha": item.get("sha", ""),
+                            "url": item.get("url", "")
+                        })
+
+    return JSONResponse({
+        "repo": clean_repo,
+        "branch": default_branch,
+        "tree": tree_items,
+        "count": len(tree_items),
+        "stars": repo_data.get("stargazers_count", 0),
+        "description": repo_data.get("description", "")
+    })
+
+
+@router.get("/public/file", summary="Fetch raw content of a file from any public GitHub repository")
+async def get_public_file(
+    repo: str = Query(..., description="Repository in owner/name format"),
+    path: str = Query(..., description="File path within the repository"),
+    branch: str = Query("main", description="Branch name")
+):
+    clean_repo = repo.strip().replace("https://github.com/", "").rstrip("/")
+    raw_url = f"https://raw.githubusercontent.com/{clean_repo}/{branch}/{path}"
+    
+    async with httpx.AsyncClient(timeout=15) as client:
+        resp = await client.get(raw_url, headers={"User-Agent": "SmellPredict-Explorer"})
+        if resp.status_code != 200:
+            # Fallback to API blob if raw failed
+            raise HTTPException(status_code=404, detail=f"File not found: {path} on branch {branch}")
+        content = resp.text
+
+    return JSONResponse({
+        "repo": clean_repo,
+        "branch": branch,
+        "path": path,
+        "content": content,
+    })

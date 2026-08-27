@@ -313,9 +313,62 @@ async def auth_github_callback(
     # Issue SmellPredict JWT (GitHub token encrypted inside payload)
     jwt_token = issue_jwt(login=login, avatar_url=avatar_url, github_token=github_token)
 
-    # Redirect to IDE — token in URL hash (never transmitted to server on redirect)
-    ide_url = f"/ui/ide.html#token={jwt_token}"
-    return RedirectResponse(url=ide_url, status_code=302)
+    redirect_target = f"/ui/ide.html?token={jwt_token}"
+    logger.info(f"Redirecting user {login} to IDE: {redirect_target}")
+    return RedirectResponse(url=redirect_target, status_code=302)
+
+
+@router.post("/guest", summary="Issue an instant guest developer session")
+async def auth_guest():
+    """
+    Creates an instant guest session with zero setup.
+    """
+    import uuid
+    guest_id = f"dev_{uuid.uuid4().hex[:6]}"
+    avatar = f"https://api.dicebear.com/7.x/bottts/svg?seed={guest_id}"
+    token = issue_jwt(login=guest_id, avatar_url=avatar, github_token="guest_token")
+    return JSONResponse({
+        "username": guest_id,
+        "avatar_url": avatar,
+        "token": token,
+        "is_guest": True,
+    })
+
+
+@router.post("/token", summary="Sign in directly via GitHub Personal Access Token (PAT)")
+async def auth_token(body: dict):
+    """
+    Allows direct login with a GitHub Personal Access Token (no OAuth config needed).
+    """
+    pat = (body.get("token") or "").strip()
+    if not pat:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Token is required.")
+    
+    async with httpx.AsyncClient(timeout=15) as client:
+        try:
+            resp = await client.get(
+                GITHUB_USER_URL,
+                headers={
+                    "Authorization": f"Bearer {pat}",
+                    "Accept": "application/vnd.github+json",
+                    "User-Agent": "SmellPredict-Platform",
+                },
+            )
+            if resp.status_code != 200:
+                raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid GitHub Token.")
+            data = resp.json()
+        except httpx.RequestError as exc:
+            raise HTTPException(status_code=502, detail=f"GitHub connection error: {exc}")
+            
+    login = data.get("login", "github_user")
+    avatar = data.get("avatar_url", "")
+    token = issue_jwt(login=login, avatar_url=avatar, github_token=pat)
+    return JSONResponse({
+        "username": login,
+        "avatar_url": avatar,
+        "token": token,
+        "is_guest": False,
+    })
 
 
 @router.get("/me", summary="Get authenticated user info from JWT")

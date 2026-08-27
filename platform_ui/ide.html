@@ -59,7 +59,7 @@
       --titlebar-h:     42px;
       --statusbar-h:    26px;
       --rail-w:         46px;
-      --sidebar-w:      250px;
+      --sidebar-w:      270px;
       --panel-w:        350px;
     }
 
@@ -82,7 +82,7 @@
 
     /* Force native standard mouse cursor */
     * { cursor: auto; }
-    button, a, select, input[type="file"], .tree-item, .tab-item, .rail-btn, .btn-tool {
+    button, a, select, input[type="file"], .tree-item, .tab-item, .rail-btn, .btn-tool, .pill-tag {
       cursor: pointer !important;
     }
 
@@ -156,18 +156,6 @@
     }
     .repo-chip svg { width: 13px; height: 13px; color: var(--amber-core); }
 
-    .branch-select {
-      background: var(--bg-input);
-      border: 1px solid var(--border-subtle);
-      border-radius: var(--radius-sm);
-      color: var(--text-secondary);
-      font-family: var(--font-code);
-      font-size: 11px;
-      padding: 3px 8px;
-      outline: none;
-    }
-    .branch-select:focus { border-color: var(--amber-core); }
-
     .title-spacer { flex: 1; }
 
     /* Action Buttons */
@@ -201,22 +189,21 @@
       box-shadow: 0 0 10px var(--amber-glow);
     }
 
-    .btn-github-auth {
+    .btn-signin-trigger {
       display: inline-flex;
       align-items: center;
       gap: 6px;
       background: #1c1917;
-      border: 1px solid rgba(245, 245, 244, 0.12);
+      border: 1px solid rgba(245, 158, 11, 0.3);
       border-radius: var(--radius-sm);
-      color: var(--text-primary);
-      font-size: 11px;
+      color: var(--amber-core);
+      font-size: 11.5px;
       font-weight: 600;
-      padding: 4px 10px;
-      text-decoration: none;
+      padding: 4px 11px;
       transition: all 0.15s ease;
     }
-    .btn-github-auth:hover { background: #292524; border-color: var(--border-crisp); }
-    .btn-github-auth svg { width: 13px; height: 13px; fill: currentColor; }
+    .btn-signin-trigger:hover { background: #262015; border-color: var(--amber-core); }
+    .btn-signin-trigger svg { width: 13px; height: 13px; fill: currentColor; }
 
     .user-profile-badge {
       display: flex;
@@ -318,7 +305,10 @@
     .sidebar-scroll {
       flex: 1;
       overflow-y: auto;
-      padding: 10px 6px;
+      padding: 10px 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
     }
 
     .group-label {
@@ -327,10 +317,68 @@
       text-transform: uppercase;
       letter-spacing: 0.06em;
       color: var(--text-muted);
-      padding: 6px 8px 4px;
+      padding: 2px 4px 6px;
       display: flex;
       align-items: center;
       justify-content: space-between;
+    }
+
+    /* Public Repo Search Box */
+    .repo-search-box {
+      background: var(--bg-input);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      padding: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .repo-input-row {
+      display: flex;
+      gap: 4px;
+    }
+    .repo-input {
+      flex: 1;
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      padding: 5px 8px;
+      color: var(--text-primary);
+      font-family: var(--font-code);
+      font-size: 11px;
+      outline: none;
+    }
+    .repo-input:focus { border-color: var(--amber-core); }
+    .btn-fetch {
+      background: #262015;
+      border: 1px solid rgba(245,158,11,0.3);
+      color: var(--amber-core);
+      border-radius: var(--radius-sm);
+      padding: 0 8px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+    .btn-fetch:hover { background: #332b1c; border-color: var(--amber-core); }
+
+    .presets-pills-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+    }
+    .pill-tag {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      padding: 2px 7px;
+      font-size: 10px;
+      font-family: var(--font-code);
+      color: var(--text-secondary);
+      transition: all 0.12s ease;
+    }
+    .pill-tag:hover {
+      background: rgba(245,158,11,0.12);
+      color: var(--amber-core);
+      border-color: rgba(245,158,11,0.3);
     }
 
     .tree-item {
@@ -343,6 +391,9 @@
       font-family: var(--font-code);
       font-size: 11.5px;
       transition: all 0.12s ease;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
     .tree-item:hover {
       background: var(--bg-card);
@@ -361,6 +412,7 @@
       padding: 1px 5px;
       border-radius: 3px;
       text-transform: uppercase;
+      flex-shrink: 0;
     }
     .tree-tag-clean { background: var(--green-glow); color: var(--green-clean); }
     .tree-tag-warn { background: var(--amber-glow); color: var(--amber-core); }
@@ -405,13 +457,6 @@
       font-weight: 600;
     }
     .tab-item svg { width: 13px; height: 13px; color: var(--amber-core); }
-    .tab-close {
-      margin-left: 6px;
-      opacity: 0.5;
-      font-size: 14px;
-      line-height: 1;
-    }
-    .tab-close:hover { opacity: 1; color: var(--red-risk); }
 
     /* Breadcrumbs */
     #breadcrumbs {
@@ -643,6 +688,77 @@
     .status-dot { width: 5px; height: 5px; border-radius: 50%; }
     .dot-live { background: var(--green-clean); box-shadow: 0 0 6px var(--green-clean); }
 
+    /* ── Seamless Auth Modal ── */
+    #auth-modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.75);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      backdrop-filter: blur(4px);
+    }
+    #auth-modal.open { display: flex; }
+    .modal-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-crisp);
+      border-radius: var(--radius-md);
+      width: 440px;
+      max-width: 90vw;
+      padding: 22px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      box-shadow: 0 16px 36px rgba(0,0,0,0.8);
+    }
+    .modal-title {
+      font-family: var(--font-display);
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--amber-core);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .modal-close {
+      background: none; border: none; color: var(--text-muted); font-size: 18px;
+    }
+    .modal-close:hover { color: var(--text-primary); }
+    .auth-option-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      transition: all 0.12s ease;
+    }
+    .auth-option-card:hover {
+      border-color: var(--amber-core);
+      background: var(--bg-card-hover);
+    }
+    .btn-auth-action {
+      background: #262015;
+      border: 1px solid rgba(245, 158, 11, 0.4);
+      color: var(--amber-core);
+      border-radius: var(--radius-sm);
+      padding: 7px 12px;
+      font-weight: 700;
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: all 0.12s ease;
+    }
+    .btn-auth-action:hover {
+      background: #332b1c;
+      border-color: var(--amber-core);
+      box-shadow: 0 0 10px var(--amber-glow);
+    }
+
     /* Toast Notification */
     #toast-msg {
       position: fixed;
@@ -684,8 +800,6 @@
       <span id="repo-label">Local Workspace</span>
     </div>
 
-    <select class="branch-select" id="branch-picker" style="display:none" onchange="switchBranch()"></select>
-
     <div class="title-spacer"></div>
 
     <button class="btn-tool" onclick="triggerFilePicker()">
@@ -693,15 +807,10 @@
       Open File
     </button>
 
-    <button class="btn-tool btn-primary-tool" onclick="openCommitModal()">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/></svg>
-      Commit Diff
-    </button>
-
-    <a class="btn-github-auth" id="github-auth-btn" href="/auth/github">
+    <button class="btn-signin-trigger" id="auth-trigger-btn" onclick="openAuthModal()">
       <svg viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
-      Sign in GitHub
-    </a>
+      Sign in / Connect
+    </button>
 
     <div class="user-profile-badge" id="user-badge" style="display:none">
       <img id="user-avatar-img" class="user-profile-avatar" src="" alt="Avatar"/>
@@ -715,7 +824,7 @@
     
     <!-- 1. Far Left Activity Rail -->
     <nav id="activity-rail">
-      <button class="rail-btn active" title="Explorer (Files & Templates)" onclick="toggleSidebar('explorer')">
+      <button class="rail-btn active" title="Explorer (Files & GitHub Repos)" onclick="toggleSidebar('explorer')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
       </button>
       <button class="rail-btn" title="Defect Intelligence Panel" onclick="focusIntelPane('analysis')">
@@ -744,43 +853,59 @@
       </div>
 
       <div class="sidebar-scroll">
-        <!-- Interactive Templates -->
-        <div class="group-label">Code Samples & Presets</div>
         
-        <div class="tree-item active" id="tree-clean" onclick="loadSample('clean')">
-          <svg viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-          <span>clean_service.py</span>
-          <span class="tree-tag tree-tag-clean">Clean</span>
-        </div>
-
-        <div class="tree-item" id="tree-godclass" onclick="loadSample('godclass')">
-          <svg viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-          <span>god_class_smelly.py</span>
-          <span class="tree-tag tree-tag-high">High Risk</span>
-        </div>
-
-        <div class="tree-item" id="tree-nesting" onclick="loadSample('nesting')">
-          <svg viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-          <span>deep_nesting.py</span>
-          <span class="tree-tag tree-tag-warn">Moderate</span>
-        </div>
-
-        <div class="tree-item" id="tree-java" onclick="loadSample('java')">
-          <svg viewBox="0 0 24 24" fill="none" stroke="#eab308" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-          <span>PaymentProcessor.java</span>
-          <span class="tree-tag" style="background:rgba(234,179,8,0.15);color:var(--amber-bright)">Java</span>
-        </div>
-
-        <!-- GitHub Remote Repos -->
-        <div class="group-label" style="margin-top:14px;">
-          <span>GitHub Repositories</span>
-          <span id="repo-count" style="font-size:9px;color:var(--amber-core);"></span>
-        </div>
-        <div id="github-tree-wrap">
-          <div style="padding:10px 8px;font-size:11px;color:var(--text-muted);line-height:1.6;">
-            Sign in with GitHub in the top-right to inspect remote branches and repositories.
+        <!-- Public GitHub Explorer -->
+        <div class="repo-search-box">
+          <div class="group-label" style="padding:0">Explore Any GitHub Repo</div>
+          <div class="repo-input-row">
+            <input type="text" class="repo-input" id="gh-repo-input" placeholder="e.g. pallets/click or URL" onkeydown="if(event.key==='Enter') fetchPublicRepo()"/>
+            <button class="btn-fetch" onclick="fetchPublicRepo()">Fetch</button>
+          </div>
+          <div class="presets-pills-row">
+            <span class="pill-tag" onclick="setAndFetchRepo('pallets/click')">click</span>
+            <span class="pill-tag" onclick="setAndFetchRepo('tiangolo/fastapi')">fastapi</span>
+            <span class="pill-tag" onclick="setAndFetchRepo('psf/requests')">requests</span>
+            <span class="pill-tag" onclick="setAndFetchRepo('iluwatar/java-design-patterns')">java-patterns</span>
           </div>
         </div>
+
+        <!-- Interactive Templates -->
+        <div class="group-label">Code Samples & Presets</div>
+        <div id="samples-tree-wrap">
+          <div class="tree-item active" id="tree-clean" onclick="loadSample('clean')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            <span>clean_service.py</span>
+            <span class="tree-tag tree-tag-clean">Clean</span>
+          </div>
+
+          <div class="tree-item" id="tree-godclass" onclick="loadSample('godclass')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            <span>god_class_smelly.py</span>
+            <span class="tree-tag tree-tag-high">High Risk</span>
+          </div>
+
+          <div class="tree-item" id="tree-nesting" onclick="loadSample('nesting')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            <span>deep_nesting.py</span>
+            <span class="tree-tag tree-tag-warn">Moderate</span>
+          </div>
+
+          <div class="tree-item" id="tree-java" onclick="loadSample('java')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#eab308" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            <span>PaymentProcessor.java</span>
+            <span class="tree-tag" style="background:rgba(234,179,8,0.15);color:var(--amber-bright)">Java</span>
+          </div>
+        </div>
+
+        <!-- Remote Repository File Tree Mount -->
+        <div id="remote-files-section" style="display:none; flex-direction:column; gap:6px;">
+          <div class="group-label">
+            <span id="remote-repo-title">Remote Files</span>
+            <span id="remote-file-count" style="font-size:9px;color:var(--amber-core);"></span>
+          </div>
+          <div id="remote-tree-list" style="display:flex;flex-direction:column;gap:2px;max-height:300px;overflow-y:auto;"></div>
+        </div>
+
       </div>
     </aside>
 
@@ -952,6 +1077,38 @@
   </footer>
 </div>
 
+<!-- ── Frictionless Sign In Modal ── -->
+<div id="auth-modal">
+  <div class="modal-card">
+    <div class="modal-title">
+      <span>Connect / Sign In</span>
+      <button class="modal-close" onclick="closeAuthModal()">&times;</button>
+    </div>
+
+    <!-- Option 1: 1-Click Guest Developer -->
+    <div class="auth-option-card">
+      <div style="font-weight:700;font-size:13px;color:var(--amber-core)">⚡ 1-Click Guest Developer (Instant)</div>
+      <div style="font-size:11.5px;color:var(--text-secondary)">Start immediately with simulated developer identity, real-time sync, and workspace persistence. No credentials needed.</div>
+      <button class="btn-auth-action" onclick="signInGuest()">Launch Guest Session &rarr;</button>
+    </div>
+
+    <!-- Option 2: GitHub Personal Access Token -->
+    <div class="auth-option-card">
+      <div style="font-weight:700;font-size:13px;color:var(--amber-core)">🔑 GitHub Personal Access Token (PAT)</div>
+      <div style="font-size:11.5px;color:var(--text-secondary)">Paste a GitHub token to browse and analyze your private repositories directly.</div>
+      <input type="password" id="pat-input" placeholder="ghp_..." style="background:var(--bg-input);border:1px solid var(--border-subtle);padding:6px 8px;border-radius:4px;color:#fff;font-size:11px;outline:none;"/>
+      <button class="btn-auth-action" onclick="signInWithPAT()">Connect Token</button>
+    </div>
+
+    <!-- Option 3: Standard GitHub OAuth -->
+    <div class="auth-option-card">
+      <div style="font-weight:700;font-size:13px;color:var(--text-primary)">🌐 GitHub OAuth Login</div>
+      <div style="font-size:11.5px;color:var(--text-secondary)">Use standard GitHub OAuth2 authorization flow.</div>
+      <a class="btn-auth-action" href="/auth/github" style="text-decoration:none">Authorize with GitHub</a>
+    </div>
+  </div>
+</div>
+
 <!-- Toast Container -->
 <div id="toast-msg">✓ Action completed</div>
 
@@ -973,7 +1130,8 @@ let currentBranch = 'main';
 
 const LANG_MAP = {
   py: 'python', java: 'java', js: 'javascript', ts: 'typescript',
-  go: 'go', rs: 'rust', cpp: 'cpp', c: 'c', html: 'html', css: 'css', json: 'json'
+  go: 'go', rs: 'rust', cpp: 'cpp', c: 'c', html: 'html', css: 'css', json: 'json',
+  yaml: 'yaml', yml: 'yaml', md: 'markdown'
 };
 
 const SAMPLES = {
@@ -1115,6 +1273,14 @@ function showToast(msg) {
   setTimeout(() => el.classList.remove('show'), 2500);
 }
 
+function openAuthModal() {
+  document.getElementById('auth-modal').classList.add('open');
+}
+
+function closeAuthModal() {
+  document.getElementById('auth-modal').classList.remove('open');
+}
+
 function switchIntelTab(tabId) {
   document.querySelectorAll('.intel-tab-btn').forEach(b => b.classList.remove('active'));
   document.querySelectorAll('.intel-content-pane').forEach(p => p.classList.remove('active'));
@@ -1192,13 +1358,91 @@ function loadSample(key) {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// MONACO EDITOR WITH PURE WARM AMBER & OBSIDIAN THEME (NO BLUE / NO PURPLE)
+// PUBLIC GITHUB REPO EXPLORATION (ZERO AUTH NEEDED)
+// ═══════════════════════════════════════════════════════════════════════════════
+function setAndFetchRepo(repoName) {
+  document.getElementById('gh-repo-input').value = repoName;
+  fetchPublicRepo();
+}
+
+async function fetchPublicRepo() {
+  const inp = document.getElementById('gh-repo-input');
+  const repo = inp.value.trim();
+  if (!repo) return;
+
+  showToast(`⚡ Fetching ${repo}...`);
+  try {
+    const res = await fetch(`/github/public/tree?repo=${encodeURIComponent(repo)}`);
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(err.detail || 'Could not fetch repo');
+    }
+    const data = await res.json();
+    currentRepo = data.repo;
+    currentBranch = data.branch;
+
+    document.getElementById('repo-label').textContent = `${data.repo}@${data.branch}`;
+    document.getElementById('remote-repo-title').textContent = data.repo;
+    document.getElementById('remote-file-count').textContent = `${data.count} files`;
+    document.getElementById('remote-files-section').style.display = 'flex';
+
+    const wrap = document.getElementById('remote-tree-list');
+    wrap.innerHTML = data.tree.slice(0, 100).map(item => {
+      const ext = item.path.split('.').pop().toLowerCase();
+      const iconColor = ext === 'py' ? '#10b981' : ext === 'java' ? '#f59e0b' : '#a8a29e';
+      return `
+        <div class="tree-item" title="${item.path}" onclick="loadPublicFile('${data.repo}', '${item.path}', '${data.branch}')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="${iconColor}" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          <span style="overflow:hidden;text-overflow:ellipsis;">${item.path}</span>
+        </div>
+      `;
+    }).join('');
+
+    showToast(`✓ Loaded ${data.count} files from ${data.repo}`);
+  } catch (err) {
+    showToast(`❌ ${err.message}`);
+  }
+}
+
+async function loadPublicFile(repo, path, branch) {
+  showToast(`Loading ${path}...`);
+  try {
+    const res = await fetch(`/github/public/file?repo=${encodeURIComponent(repo)}&path=${encodeURIComponent(path)}&branch=${encodeURIComponent(branch)}`);
+    if (!res.ok) throw new Error('Failed to load file');
+    const data = await res.json();
+
+    const fname = path.split('/').pop();
+    const ext = fname.split('.').pop().toLowerCase();
+    const lang = LANG_MAP[ext] || 'plaintext';
+
+    currentFilename = fname;
+    currentLanguage = lang;
+    currentContent = data.content;
+
+    document.getElementById('active-tab-name').textContent = fname;
+    document.getElementById('crumb-filename').textContent = `${repo}/${path}`;
+    document.getElementById('sb-lang-node').textContent = lang.toUpperCase();
+
+    if (editor) {
+      const model = monaco.editor.createModel(currentContent, lang);
+      const old = editor.getModel();
+      editor.setModel(model);
+      if (old) old.dispose();
+      triggerAnalysis();
+    }
+    showToast(`✓ Loaded ${fname}`);
+  } catch (err) {
+    showToast(`❌ Error: ${err.message}`);
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// MONACO EDITOR (WARM AMBER OBSIDIAN THEME)
 // ═══════════════════════════════════════════════════════════════════════════════
 function initMonaco() {
   require.config({ paths: { vs: 'https://cdn.jsdelivr.net/npm/monaco-editor@0.48.0/min/vs' } });
   require(['vs/editor/editor.main'], () => {
     
-    // Handcrafted Warm Obsidian & Amber Theme
     monaco.editor.defineTheme('warm-amber-obsidian', {
       base: 'vs-dark',
       inherit: true,
@@ -1246,53 +1490,10 @@ function initMonaco() {
       padding: { top: 12 },
     });
 
-    // Keystroke debounced inference
     editor.onDidChangeModelContent(() => {
       clearTimeout(analysisTimer);
       analysisTimer = setTimeout(triggerAnalysis, 350);
       document.getElementById('sb-status-text').textContent = 'Analyzing AST...';
-    });
-
-    // Drag-and-drop file ingestion onto Monaco
-    mount.addEventListener('dragover', (e) => {
-      e.preventDefault();
-      mount.style.boxShadow = 'inset 0 0 0 2px var(--amber-core)';
-    });
-    mount.addEventListener('dragleave', (e) => {
-      e.preventDefault();
-      mount.style.boxShadow = 'none';
-    });
-    mount.addEventListener('drop', (e) => {
-      e.preventDefault();
-      mount.style.boxShadow = 'none';
-      if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-        const file = e.dataTransfer.files[0];
-        const reader = new FileReader();
-        reader.onload = (re) => {
-          const content = re.target.result;
-          const fname = file.name;
-          const ext = fname.split('.').pop().toLowerCase();
-          const lang = LANG_MAP[ext] || 'plaintext';
-
-          currentFilename = fname;
-          currentLanguage = lang;
-          currentContent = content;
-
-          document.getElementById('active-tab-name').textContent = fname;
-          document.getElementById('crumb-filename').textContent = fname;
-          document.getElementById('sb-lang-node').textContent = lang.toUpperCase();
-
-          if (editor) {
-            const model = monaco.editor.createModel(content, lang);
-            const old = editor.getModel();
-            editor.setModel(model);
-            if (old) old.dispose();
-            triggerAnalysis();
-          }
-          showToast(`✓ Dropped & loaded ${fname}`);
-        };
-        reader.readAsText(file);
-      }
     });
 
     // Initial analysis
@@ -1331,7 +1532,6 @@ function updateAnalysisView(data, latency) {
   const pct = Math.round(prob * 100);
   const tier = data.risk?.tier || 'Low';
 
-  // Update Phosphor Bar
   const bar = document.getElementById('phosphor-bar');
   bar.style.width = pct + '%';
 
@@ -1349,7 +1549,6 @@ function updateAnalysisView(data, latency) {
 
   document.getElementById('risk-caption-txt').textContent = data.risk?.recommendation || 'Standard peer review recommended.';
 
-  // Technical Telemetry
   const metrics = data.metrics || {};
   document.getElementById('m-loc').textContent = metrics.loc || 0;
   document.getElementById('m-comp').textContent = (metrics.max_cyclomatic_complexity || metrics.cyclomatic_complexity || 1).toFixed(1);
@@ -1363,7 +1562,6 @@ function updateAnalysisView(data, latency) {
 
   document.getElementById('m-cog').textContent = metrics.cognitive_complexity || 0;
 
-  // Architectural Smells
   const smells = data.smells || {};
   const smellDefs = [
     ['has_long_method', 'Long Method'],
@@ -1389,7 +1587,6 @@ function updateAnalysisView(data, latency) {
     `;
   }).join('');
 
-  // In-Editor Squiggly Diagnostics
   if (editor && typeof monaco !== 'undefined') {
     const model = editor.getModel();
     if (model) {
@@ -1411,29 +1608,58 @@ function updateAnalysisView(data, latency) {
     }
   }
 
-  // Statusbar
   document.getElementById('sb-status-text').textContent = 'Synchronized';
   document.getElementById('sb-latency').textContent = `${latency}ms inference`;
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// CHAT & GITHUB INTEGRATION
+// FRICTIONLESS AUTH METHODS (1-CLICK GUEST / PAT / OAUTH)
 // ═══════════════════════════════════════════════════════════════════════════════
-function sendChatMessage() {
-  const inp = document.getElementById('chat-input');
-  const txt = (inp.value || '').trim();
-  if (!txt) return;
+async function signInGuest() {
+  showToast('⚡ Launching Guest Session...');
+  try {
+    const res = await fetch('/auth/guest', { method: 'POST' });
+    const data = await res.json();
+    jwt = data.token;
+    localStorage.setItem('sp_jwt', jwt);
+    applyUserSession(data.username, data.avatar_url);
+    closeAuthModal();
+    showToast(`✓ Welcome, ${data.username}!`);
+  } catch (e) {
+    showToast('❌ Guest session failed');
+  }
+}
 
-  const wrap = document.getElementById('chat-messages');
-  const bubble = document.createElement('div');
-  bubble.style.cssText = 'background:var(--bg-card);padding:8px 10px;border-radius:4px;border:1px solid var(--border-subtle);';
-  bubble.innerHTML = `
-    <div style="font-size:10px;color:var(--amber-core);font-weight:700;margin-bottom:3px">You · Just now</div>
-    <div style="font-size:11.5px;color:var(--text-primary);">${txt}</div>
-  `;
-  wrap.appendChild(bubble);
-  wrap.scrollTop = wrap.scrollHeight;
-  inp.value = '';
+async function signInWithPAT() {
+  const inp = document.getElementById('pat-input');
+  const token = inp.value.trim();
+  if (!token) return showToast('❌ Token is required');
+
+  showToast('🔑 Connecting Token...');
+  try {
+    const res = await fetch('/auth/token', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token })
+    });
+    if (!res.ok) throw new Error('Invalid token');
+    const data = await res.json();
+    jwt = data.token;
+    localStorage.setItem('sp_jwt', jwt);
+    applyUserSession(data.username, data.avatar_url);
+    closeAuthModal();
+    showToast(`✓ Connected as ${data.username}!`);
+  } catch (e) {
+    showToast('❌ Invalid Token');
+  }
+}
+
+function applyUserSession(username, avatarUrl) {
+  document.getElementById('auth-trigger-btn').style.display = 'none';
+  const badge = document.getElementById('user-badge');
+  badge.style.display = 'flex';
+  document.getElementById('user-avatar-img').src = avatarUrl;
+  document.getElementById('user-name-txt').textContent = username;
 }
 
 async function checkAuth() {
@@ -1451,45 +1677,32 @@ async function checkAuth() {
     const res = await fetch('/auth/me', { headers: { 'Authorization': `Bearer ${jwt}` } });
     if (!res.ok) throw new Error('Auth invalid');
     const user = await res.json();
-
-    document.getElementById('github-auth-btn').style.display = 'none';
-    const badge = document.getElementById('user-badge');
-    badge.style.display = 'flex';
-    document.getElementById('user-avatar-img').src = user.avatar_url;
-    document.getElementById('user-name-txt').textContent = user.username;
-
-    loadUserRepos();
+    applyUserSession(user.username, user.avatar_url);
   } catch (e) {
     localStorage.removeItem('sp_jwt');
   }
 }
 
-async function loadUserRepos() {
-  if (!jwt) return;
-  try {
-    const res = await fetch('/github/repos', { headers: { 'Authorization': `Bearer ${jwt}` } });
-    if (!res.ok) return;
-    const data = await res.json();
-    const list = data.repositories || [];
-    document.getElementById('repo-count').textContent = `${list.length} repos`;
-
-    const wrap = document.getElementById('github-tree-wrap');
-    wrap.innerHTML = list.map(r => `
-      <div class="tree-item" onclick="openRepo('${r.full_name}')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
-        <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${r.name}</span>
-      </div>
-    `).join('');
-  } catch (e) {}
-}
-
-function openCommitModal() {
-  showToast('✓ Staged changes ready for commit');
-}
-
 function logout() {
   localStorage.removeItem('sp_jwt');
   window.location.reload();
+}
+
+function sendChatMessage() {
+  const inp = document.getElementById('chat-input');
+  const txt = (inp.value || '').trim();
+  if (!txt) return;
+
+  const wrap = document.getElementById('chat-messages');
+  const bubble = document.createElement('div');
+  bubble.style.cssText = 'background:var(--bg-card);padding:8px 10px;border-radius:4px;border:1px solid var(--border-subtle);';
+  bubble.innerHTML = `
+    <div style="font-size:10px;color:var(--amber-core);font-weight:700;margin-bottom:3px">You · Just now</div>
+    <div style="font-size:11.5px;color:var(--text-primary);">${txt}</div>
+  `;
+  wrap.appendChild(bubble);
+  wrap.scrollTop = wrap.scrollHeight;
+  inp.value = '';
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
