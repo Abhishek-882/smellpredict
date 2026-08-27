@@ -1178,9 +1178,21 @@
 
     <!-- Option 1: GitHub Personal Access Token (Loads Private & Public Repos) -->
     <div class="auth-option-card">
-      <div style="font-weight:700;font-size:13px;color:var(--cyan-bright)">Personal Access Token (Classic & Fine-Grained)</div>
-      <div style="font-size:11.5px;color:var(--text-secondary)">Access your <strong>private and public repositories</strong> directly without OAuth app setup. Paste your GitHub token below:</div>
-      <input type="password" id="pat-input" placeholder="github_pat_... or ghp_..." style="background:var(--bg-input);border:1px solid var(--border-subtle);padding:7px 9px;border-radius:4px;color:#fff;font-family:var(--font-code);font-size:11px;outline:none;"/>
+      <div style="font-weight:700;font-size:13px;color:var(--cyan-bright)">Personal Access Token (Fine-Grained & Classic)</div>
+      <div style="font-size:11.5px;color:var(--text-secondary);line-height:1.5;">
+        Access your <strong>private and public repositories</strong> directly without OAuth app setup.
+        <div style="margin-top:6px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+          <span style="color:var(--text-muted);font-size:10.5px;">Generate token here:</span>
+          <a href="https://github.com/settings/personal-access-tokens" target="_blank" rel="noopener noreferrer" style="color:var(--cyan-bright);text-decoration:none;font-size:11px;font-weight:600;display:inline-flex;align-items:center;gap:4px;background:rgba(6,182,212,0.12);padding:2px 8px;border-radius:4px;border:1px solid rgba(6,182,212,0.3);transition:all 0.2s;">
+            github.com/settings/personal-access-tokens
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+          </a>
+        </div>
+        <div style="font-size:10px;color:#64748b;margin-top:4px;">
+          💡 <em>Recommended: Select repository access and enable <strong>Contents (Read-only)</strong> & <strong>Metadata</strong>.</em>
+        </div>
+      </div>
+      <input type="password" id="pat-input" placeholder="github_pat_... or ghp_..." style="background:var(--bg-input);border:1px solid var(--border-subtle);padding:7px 9px;border-radius:4px;color:#fff;font-family:var(--font-code);font-size:11px;outline:none;margin-top:4px;"/>
       <button class="btn-auth-action" onclick="signInWithPAT()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 2l-2 2m-1.5 1.5L14 9l-3-3 2.5-2.5a3 3 0 0 1 4.24 0l3.26 3.26a3 3 0 0 1 0 4.24l-8.5 8.5a3 3 0 0 1-4.24 0L2 17l6-6"/></svg>
         Connect & Load Repositories
