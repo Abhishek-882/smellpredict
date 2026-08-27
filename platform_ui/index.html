@@ -230,9 +230,8 @@ body.intro-active {
 .scanline {
   position: fixed; top: 0; left: 0; right: 0; height: 2px;
   background: linear-gradient(90deg, transparent, rgba(79,158,255,0.4), transparent);
-  animation: scanline 8s linear infinite; pointer-events: none; z-index: 3; opacity: 0.3;
-}
 @keyframes scanline { 0% { transform: translateY(-100%); } 100% { transform: translateY(100vh); } }
+@keyframes pulseDot { 0%, 100% { transform: scale(1); opacity: 1; box-shadow: 0 0 12px #06b6d4; } 50% { transform: scale(1.4); opacity: 0.6; box-shadow: 0 0 22px #38bdf8; } }
 
 .wrap { position: relative; z-index: 2; }
 
@@ -651,6 +650,94 @@ footer {
         </div>
       </div>
     </div>
+  </div>
+</section>
+
+<!-- ── Next-Gen Capabilities / Coming Soon Roadmap ── -->
+<section class="section" style="margin-top:20px;">
+  <div style="display:flex;align-items:center;gap:8px;justify-content:center;margin-bottom:12px;">
+    <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#06b6d4;box-shadow:0 0 12px #06b6d4;animation:pulseDot 2s infinite;"></span>
+    <span style="font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#38bdf8;">Enterprise Innovations · Coming Soon</span>
+  </div>
+  <div class="section-title" style="text-align:center;">Autonomous Defect Prevention Suite</div>
+  <p class="section-sub" style="text-align:center;max-width:640px;margin:0 auto 40px;">
+    Upcoming enterprise capabilities engineered to transform static defect prediction into continuous autonomous remediation across multi-cloud repositories.
+  </p>
+
+  <div class="roadmap-grid reveal" style="display:grid;grid-template-columns:repeat(auto-fit, minmax(260px, 1fr));gap:20px;max-width:1120px;margin:0 auto;">
+    
+    <!-- Card 1: Autonomous AI Refactoring -->
+    <div class="roadmap-card" style="background:rgba(15,23,42,0.8);backdrop-filter:blur(12px);border:1px solid rgba(6,182,212,0.25);border-radius:12px;padding:24px;position:relative;overflow:hidden;transition:all 0.3s cubic-bezier(0.16,1,0.3,1);" onmouseover="this.style.borderColor='#06b6d4';this.style.transform='translateY(-4px)';this.style.boxShadow='0 12px 30px rgba(6,182,212,0.15)';" onmouseout="this.style.borderColor='rgba(6,182,212,0.25)';this.style.transform='none';this.style.boxShadow='none';">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+        <div style="width:38px;height:38px;border-radius:8px;background:rgba(6,182,212,0.1);display:flex;align-items:center;justify-content:center;border:1px solid rgba(6,182,212,0.3);">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#06b6d4" stroke-width="2" style="width:20px;height:20px;"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
+        </div>
+        <span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;padding:4px 10px;border-radius:20px;background:rgba(6,182,212,0.15);color:#38bdf8;border:1px solid rgba(6,182,212,0.3);">✦ In Private Beta</span>
+      </div>
+      <div style="font-size:16px;font-weight:700;color:#f8fafc;margin-bottom:8px;">Autonomous AI Refactoring PRs</div>
+      <div style="font-size:13px;color:#94a3b8;line-height:1.6;margin-bottom:20px;">
+        One-click automated Pull Requests that decompose God Methods, simplify deeply nested loops, and rewrite high-risk AST branches while preserving 100% test coverage.
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;padding-top:14px;border-top:1px solid rgba(255,255,255,0.06);font-size:11px;color:#64748b;">
+        <span>Readiness</span>
+        <span style="color:#06b6d4;font-weight:700;">85% Completed</span>
+      </div>
+    </div>
+
+    <!-- Card 2: CI/CD Quality Gatekeeper -->
+    <div class="roadmap-card" style="background:rgba(15,23,42,0.8);backdrop-filter:blur(12px);border:1px solid rgba(99,102,241,0.25);border-radius:12px;padding:24px;position:relative;overflow:hidden;transition:all 0.3s cubic-bezier(0.16,1,0.3,1);" onmouseover="this.style.borderColor='#818cf8';this.style.transform='translateY(-4px)';this.style.boxShadow='0 12px 30px rgba(99,102,241,0.15)';" onmouseout="this.style.borderColor='rgba(99,102,241,0.25)';this.style.transform='none';this.style.boxShadow='none';">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+        <div style="width:38px;height:38px;border-radius:8px;background:rgba(99,102,241,0.1);display:flex;align-items:center;justify-content:center;border:1px solid rgba(99,102,241,0.3);">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#818cf8" stroke-width="2" style="width:20px;height:20px;"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        </div>
+        <span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;padding:4px 10px;border-radius:20px;background:rgba(99,102,241,0.15);color:#a5b4fc;border:1px solid rgba(99,102,241,0.3);">✦ Coming Soon</span>
+      </div>
+      <div style="font-size:16px;font-weight:700;color:#f8fafc;margin-bottom:8px;">GitHub Actions CI/CD Gate</div>
+      <div style="font-size:13px;color:#94a3b8;line-height:1.6;margin-bottom:20px;">
+        Pre-merge automated status checks that enforce defect probability thresholds, calculate delta maintainability indexes, and prevent regression debt from entering trunk.
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;padding-top:14px;border-top:1px solid rgba(255,255,255,0.06);font-size:11px;color:#64748b;">
+        <span>Readiness</span>
+        <span style="color:#818cf8;font-weight:700;">70% Completed</span>
+      </div>
+    </div>
+
+    <!-- Card 3: Enterprise Fine-Tuning Studio -->
+    <div class="roadmap-card" style="background:rgba(15,23,42,0.8);backdrop-filter:blur(12px);border:1px solid rgba(16,185,129,0.25);border-radius:12px;padding:24px;position:relative;overflow:hidden;transition:all 0.3s cubic-bezier(0.16,1,0.3,1);" onmouseover="this.style.borderColor='#10b981';this.style.transform='translateY(-4px)';this.style.boxShadow='0 12px 30px rgba(16,185,129,0.15)';" onmouseout="this.style.borderColor='rgba(16,185,129,0.25)';this.style.transform='none';this.style.boxShadow='none';">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+        <div style="width:38px;height:38px;border-radius:8px;background:rgba(16,185,129,0.1);display:flex;align-items:center;justify-content:center;border:1px solid rgba(16,185,129,0.3);">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" style="width:20px;height:20px;"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+        </div>
+        <span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;padding:4px 10px;border-radius:20px;background:rgba(16,185,129,0.15);color:#6ee7b7;border:1px solid rgba(16,185,129,0.3);">✦ In Development</span>
+      </div>
+      <div style="font-size:16px;font-weight:700;color:#f8fafc;margin-bottom:8px;">Custom Model Fine-Tuning</div>
+      <div style="font-size:13px;color:#94a3b8;line-height:1.6;margin-bottom:20px;">
+        Train proprietary LightGBM / CatBoost estimators calibrated against your internal git history, company-specific architectural patterns, and private commit dynamics.
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;padding-top:14px;border-top:1px solid rgba(255,255,255,0.06);font-size:11px;color:#64748b;">
+        <span>Readiness</span>
+        <span style="color:#10b981;font-weight:700;">60% Completed</span>
+      </div>
+    </div>
+
+    <!-- Card 4: Multi-Repo Dependency Graph -->
+    <div class="roadmap-card" style="background:rgba(15,23,42,0.8);backdrop-filter:blur(12px);border:1px solid rgba(245,158,11,0.25);border-radius:12px;padding:24px;position:relative;overflow:hidden;transition:all 0.3s cubic-bezier(0.16,1,0.3,1);" onmouseover="this.style.borderColor='#f59e0b';this.style.transform='translateY(-4px)';this.style.boxShadow='0 12px 30px rgba(245,158,11,0.15)';" onmouseout="this.style.borderColor='rgba(245,158,11,0.25)';this.style.transform='none';this.style.boxShadow='none';">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+        <div style="width:38px;height:38px;border-radius:8px;background:rgba(245,158,11,0.1);display:flex;align-items:center;justify-content:center;border:1px solid rgba(245,158,11,0.3);">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2" style="width:20px;height:20px;"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+        </div>
+        <span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;padding:4px 10px;border-radius:20px;background:rgba(245,158,11,0.15);color:#fcd34d;border:1px solid rgba(245,158,11,0.3);">✦ Planned</span>
+      </div>
+      <div style="font-size:16px;font-weight:700;color:#f8fafc;margin-bottom:8px;">Cross-Repo Semantic Graphs</div>
+      <div style="font-size:13px;color:#94a3b8;line-height:1.6;margin-bottom:20px;">
+        Interactive 3D dependency visualization linking upstream microservices, shared API contracts, and cross-package co-change risk blast radiuses.
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;padding-top:14px;border-top:1px solid rgba(255,255,255,0.06);font-size:11px;color:#64748b;">
+        <span>Readiness</span>
+        <span style="color:#f59e0b;font-weight:700;">Design Phase</span>
+      </div>
+    </div>
+
   </div>
 </section>
 
