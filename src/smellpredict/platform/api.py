@@ -564,112 +564,124 @@ async def analyze_live(body: LiveAnalysisRequest):
 
     ext = Path(body.filename).suffix.lower()
 
-    # Java dedicated ML model routing
-    if ext == ".java":
+    # 1. Python (.py) — ONLY language with ML Defect Risk Evaluation
+    if ext == ".py":
         try:
-            from smellpredict.models.java_predictor import analyze_java_source_code
-            j_res = analyze_java_source_code(body.content, file_path=body.filename)
-            smells = j_res.get("smells", {})
+            from smellpredict.models.predictor import analyze_source_code
+
+            result = analyze_source_code(body.content, file_path=body.filename)
+
+            smells = result.get("smells", {})
             ref_list = []
-            for r in j_res.get("refactoring_advice", [])[:5]:
+            for r in result.get("refactoring_advice", []):
                 if hasattr(r, "to_dict"):
                     ref_list.append(r.to_dict())
                 elif hasattr(r, "__dict__"):
                     ref_list.append(vars(r))
                 elif isinstance(r, dict):
                     ref_list.append(r)
-                else:
-                    ref_list.append({"rule_name": str(r), "advice": str(r)})
+
             return JSONResponse({
-                "language": "java",
-                "language_badge": "☕ Java",
+                "language": "python",
+                "language_badge": "🐍 Python",
                 "risk": {
-                    "probability": float(j_res.get("risk_probability", 0.0)),
-                    "tier": j_res.get("risk_tier", "Low"),
-                    "icon": j_res.get("risk_icon", "🟢"),
-                    "recommendation": j_res.get("recommendation", ""),
+                    "probability": float(result.get("risk_probability", 0.0)),
+                    "tier":           result.get("risk_tier", "Low"),
+                    "icon":           result.get("risk_icon", "🟢"),
+                    "recommendation": result.get("recommendation", ""),
                 },
+                "engine_used": result.get("engine_used", "engine_a_ast_static"),
+                "engine_desc": result.get("engine_desc", "Engine A (Pure Static AST)"),
+                "guardrail_status": result.get("guardrail_status", "normal"),
+                "confidence_warning": result.get("confidence_warning"),
                 "smells": {
-                    "has_long_method": int(smells.get("has_long_method", 0)),
+                    "has_long_method":     int(smells.get("has_long_method", 0)),
                     "has_long_param_list": int(smells.get("has_long_param_list", 0)),
-                    "has_large_class": int(smells.get("has_large_class", 0)),
-                    "has_deep_nesting": int(smells.get("has_deep_nesting", 0)),
-                    "has_high_complexity": int(smells.get("has_high_complexity", 0)),
-                    "total_smells": int(smells.get("total_smells", 0)),
+                    "has_large_class":     int(smells.get("has_large_class", 0)),
+                    "has_deep_nesting":    int(smells.get("has_deep_nesting", 0)),
+                    "total_smells":        int(smells.get("total_smells", 0)),
                 },
-                "metrics": j_res.get("code_metrics", {}),
+                "metrics": result.get("code_metrics", {}),
                 "refactoring": ref_list,
                 "filename": body.filename,
-                "is_ml_prediction": j_res.get("is_ml_prediction", False),
+                "is_ml_prediction": True,
             })
         except Exception as exc:
-            logger.error(f"Java live analysis error for {body.filename}: {exc}")
+            logger.error(f"Live analysis error for {body.filename}: {exc}")
+            return JSONResponse(
+                {"error": f"Analysis failed: {exc}", "risk": None, "is_ml_prediction": False,
+                 "smells": {}, "refactoring": []},
+                status_code=500,
+            )
 
     from smellpredict.features.polyglot import EXTENSION_MAP, LANGUAGE_BADGES
 
-    # Non-Python polyglot language routing
-    if ext != ".py" and ext in EXTENSION_MAP:
+    # 2. Known Polyglot Source Code (.java, .js, .ts, .go, .rs, .c, .cpp, .rb, .php, .kt, .swift)
+    # Extract static telemetry only — NO ML RISK EVALUATION
+    if ext in EXTENSION_MAP:
         try:
             from smellpredict.features.polyglot import polyglot_analyze
             p_res = polyglot_analyze(body.content, file_path=body.filename)
             res_dict = p_res.to_dict()
             res_dict["language_badge"] = LANGUAGE_BADGES.get(p_res.language, "📄 File")
+            res_dict["risk"] = None
+            res_dict["is_ml_prediction"] = False
             return JSONResponse(res_dict)
         except Exception as exc:
             logger.error(f"Polyglot live analysis error for {body.filename}: {exc}")
             return JSONResponse(
-                {"error": f"Polyglot analysis failed: {exc}", "risk": None, "smells": {}, "refactoring": []},
+                {"error": f"Polyglot analysis failed: {exc}", "risk": None, "is_ml_prediction": False, "smells": {}, "refactoring": []},
                 status_code=500,
             )
 
-    # Python Dual-Engine routing (Engine A: Static AST vs Engine B: Telemetry)
-    try:
-        from smellpredict.models.predictor import analyze_source_code
-
-        result = analyze_source_code(body.content, file_path=body.filename)
-
-        smells = result.get("smells", {})
-        ref_list = []
-        for r in result.get("refactoring_advice", []):
-            if hasattr(r, "to_dict"):
-                ref_list.append(r.to_dict())
-            elif hasattr(r, "__dict__"):
-                ref_list.append(vars(r))
-            elif isinstance(r, dict):
-                ref_list.append(r)
-
+    # 3. Binary / Media / Non-Code files (.jpg, .png, .gif, .pdf, .zip, etc.)
+    MEDIA_EXTS = {
+        ".jpg", ".jpeg", ".png", ".gif", ".webp", ".bmp", ".ico", ".svg",
+        ".pdf", ".zip", ".tar", ".gz", ".7z", ".rar", ".exe", ".dll", ".so",
+        ".dylib", ".bin", ".mp4", ".mp3", ".wav", ".woff", ".woff2", ".ttf", ".eot"
+    }
+    if ext in MEDIA_EXTS:
         return JSONResponse({
-            "language": "python",
-            "language_badge": "🐍 Python",
-            "risk": {
-                "probability": float(result.get("risk_probability", 0.0)),
-                "tier":           result.get("risk_tier", "Low"),
-                "icon":           result.get("risk_icon", "🟢"),
-                "recommendation": result.get("recommendation", ""),
+            "language": "binary",
+            "language_badge": "🖼️ Media / Binary",
+            "risk": None,
+            "is_ml_prediction": False,
+            "engine_used": "none",
+            "engine_desc": "Media / Binary (No ML Evaluation)",
+            "guardrail_status": "non_code_file",
+            "confidence_warning": "Binary and media files are not evaluated for software defect risk.",
+            "metrics": {
+                "loc": 0, "sloc": 0, "blank_lines": 0, "comment_lines": 0,
+                "function_count": 0, "class_count": 0, "max_nesting_depth": 0,
+                "cyclomatic_complexity": 0, "maintainability_index": 100.0,
             },
-            "engine_used": result.get("engine_used", "engine_a_ast_static"),
-            "engine_desc": result.get("engine_desc", "Engine A (Pure Static AST)"),
-            "guardrail_status": result.get("guardrail_status", "normal"),
-            "confidence_warning": result.get("confidence_warning"),
-            "smells": {
-                "has_long_method":     int(smells.get("has_long_method", 0)),
-                "has_long_param_list": int(smells.get("has_long_param_list", 0)),
-                "has_large_class":     int(smells.get("has_large_class", 0)),
-                "has_deep_nesting":    int(smells.get("has_deep_nesting", 0)),
-                "total_smells":        int(smells.get("total_smells", 0)),
-            },
-            "metrics": result.get("code_metrics", {}),
-            "refactoring": ref_list,
+            "smells": {},
+            "refactoring": [],
             "filename": body.filename,
-            "is_ml_prediction": result.get("model_loaded", False),
         })
-    except Exception as exc:
-        logger.error(f"Live analysis error for {body.filename}: {exc}")
-        return JSONResponse(
-            {"error": f"Analysis failed: {exc}", "risk": None,
-             "smells": {}, "refactoring": []},
-            status_code=500,
-        )
+
+    # 4. Plaintext / Config / Unknown Text files (.txt, .md, .json, .yaml, .yml, .toml, .csv, etc.)
+    lines = body.content.splitlines()
+    loc = len(lines)
+    sloc = len([l for l in lines if l.strip()])
+    return JSONResponse({
+        "language": "plaintext",
+        "language_badge": "📄 Plaintext / Config",
+        "risk": None,
+        "is_ml_prediction": False,
+        "engine_used": "none",
+        "engine_desc": "Non-Python File (No ML Evaluation)",
+        "guardrail_status": "unsupported_language",
+        "confidence_warning": "Defect risk prediction is strictly trained for Python (.py) source code.",
+        "metrics": {
+            "loc": loc, "sloc": sloc, "blank_lines": loc - sloc, "comment_lines": 0,
+            "function_count": 0, "class_count": 0, "max_nesting_depth": 0,
+            "cyclomatic_complexity": 0, "maintainability_index": 100.0,
+        },
+        "smells": {},
+        "refactoring": [],
+        "filename": body.filename,
+    })
 
 
 @app.get(
