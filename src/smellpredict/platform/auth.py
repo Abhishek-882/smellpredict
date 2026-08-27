@@ -338,30 +338,45 @@ async def auth_guest():
 @router.post("/token", summary="Sign in directly via GitHub Personal Access Token (PAT)")
 async def auth_token(body: dict):
     """
-    Allows direct login with a GitHub Personal Access Token (no OAuth config needed).
+    Allows direct login with a GitHub Personal Access Token (classic or fine-grained).
     """
     pat = (body.get("token") or "").strip()
     if not pat:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Token is required.")
     
+    auth_header = f"Bearer {pat}" if pat.startswith("github_pat_") or pat.startswith("ghp_") else f"token {pat}"
+    headers = {
+        "Authorization": auth_header,
+        "Accept": "application/vnd.github+json",
+        "User-Agent": "SmellPredict-Platform",
+        "X-GitHub-Api-Version": "2022-11-28",
+    }
+
+    login = "github_developer"
+    avatar = "https://github.com/github.png"
+
     async with httpx.AsyncClient(timeout=15) as client:
         try:
-            resp = await client.get(
-                GITHUB_USER_URL,
-                headers={
-                    "Authorization": f"Bearer {pat}",
-                    "Accept": "application/vnd.github+json",
-                    "User-Agent": "SmellPredict-Platform",
-                },
-            )
-            if resp.status_code != 200:
-                raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid GitHub Token.")
-            data = resp.json()
+            resp = await client.get(GITHUB_USER_URL, headers=headers)
+            if resp.status_code == 200:
+                data = resp.json()
+                login = data.get("login", login)
+                avatar = data.get("avatar_url", avatar)
+            else:
+                # Fine-grained tokens may not have user profile scope; verify via repos or rate_limit
+                repo_resp = await client.get("https://api.github.com/user/repos?per_page=1", headers=headers)
+                if repo_resp.status_code == 200:
+                    repos = repo_resp.json()
+                    if isinstance(repos, list) and len(repos) > 0 and "owner" in repos[0]:
+                        login = repos[0]["owner"].get("login", login)
+                        avatar = repos[0]["owner"].get("avatar_url", avatar)
+                else:
+                    rate_resp = await client.get("https://api.github.com/rate_limit", headers=headers)
+                    if rate_resp.status_code != 200:
+                        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid GitHub Personal Access Token. Please verify your token.")
         except httpx.RequestError as exc:
             raise HTTPException(status_code=502, detail=f"GitHub connection error: {exc}")
             
-    login = data.get("login", "github_user")
-    avatar = data.get("avatar_url", "")
     token = issue_jwt(login=login, avatar_url=avatar, github_token=pat)
     return JSONResponse({
         "username": login,
