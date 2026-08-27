@@ -238,6 +238,11 @@ def get_java_model():
 from fastapi.responses import HTMLResponse
 
 @app.head("/", include_in_schema=False)
+async def root_head():
+    """Direct 200 OK for Render and Uptime probes."""
+    from fastapi.responses import Response
+    return Response(status_code=200)
+
 @app.get("/", include_in_schema=False)
 async def root():
     """Redirect directly to the SmellPredict platform workbench."""

@@ -32,10 +32,14 @@ from __future__ import annotations
 
 import asyncio
 import hashlib
+import json
 import os
+import time
+import uuid
 from typing import Optional
 
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect, Query
+from starlette.websockets import WebSocketState
 try:
     from loguru import logger
 except ImportError:
@@ -269,7 +273,7 @@ async def _broadcast_json(room_id: str, payload: dict, exclude: Optional[WebSock
     import json
     msg_str = json.dumps(payload)
     for peer in list(peers):
-        if peer.client_state == WebSocketState.CONNECTED:
+        if getattr(peer, "client_state", None) == WebSocketState.CONNECTED:
             try:
                 await peer.send_text(msg_str)
             except Exception as exc:
@@ -327,6 +331,10 @@ async def collab_websocket(
         # ── Main relay loop (handles binary and text) ─────────────────────────
         while True:
             msg = await websocket.receive()
+            if msg.get("type") == "websocket.disconnect":
+                logger.debug(f"[room:{room_id}] Received disconnect signal for {username}")
+                break
+
             if "bytes" in msg and msg["bytes"]:
                 raw_bytes = msg["bytes"]
                 # Persist binary CRDT update
@@ -335,7 +343,7 @@ async def collab_websocket(
                 # Broadcast binary update to peers
                 peers_in_room = _rooms.get(room_id, set()) - {websocket}
                 for peer in list(peers_in_room):
-                    if peer.client_state == WebSocketState.CONNECTED:
+                    if getattr(peer, "client_state", None) == WebSocketState.CONNECTED:
                         try:
                             await peer.send_bytes(raw_bytes)
                         except Exception as exc:
@@ -343,7 +351,6 @@ async def collab_websocket(
 
             elif "text" in msg and msg["text"]:
                 # Text JSON control frame (chat/presence/cursor)
-                import json
                 try:
                     data = json.loads(msg["text"])
                     event_type = data.get("type")
@@ -379,7 +386,8 @@ async def collab_websocket(
     except WebSocketDisconnect:
         logger.info(f"[room:{room_id}] {username} disconnected")
     except Exception as exc:
-        logger.error(f"[room:{room_id}] Unexpected error for {username}: {exc}")
+        if "disconnect message has been received" not in str(exc):
+            logger.error(f"[room:{room_id}] Unexpected error for {username}: {exc}")
     finally:
         # ── Clean up ────────────────────────────────────────────────────────
         if room_id in _rooms:
