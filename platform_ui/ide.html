@@ -1,0 +1,1504 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SmellPredict — Defect Intelligence IDE</title>
+  
+  <!-- Fonts: Space Grotesk (Geometry & Headers), Inter (Ergonomics), JetBrains Mono (Code) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Space+Grotesk:wght@500;600;700;800&display=swap" rel="stylesheet"/>
+
+  <style>
+    /* ═══════════════════════════════════════════════════════════════════════════════
+       WARM OBSIDIAN, AMBER GOLD & FOREST EMERALD TOKENS (ZERO BLUE, ZERO PURPLE)
+       ═══════════════════════════════════════════════════════════════════════════════ */
+    :root {
+      --bg-canvas:      #0d0d0d;  /* Deep Warm Neutral Black */
+      --bg-rail:        #080808;  /* Deepest Charcoal Rail */
+      --bg-surface:     #141414;  /* Sidebar & Titlebar */
+      --bg-card:        #1c1c1c;  /* Elevated Panels & Cards */
+      --bg-card-hover:  #242424;  /* Interactive Hover */
+      --bg-input:       #111111;  /* Input & Code Background */
+      
+      --border-subtle:  rgba(255, 255, 255, 0.07);
+      --border-crisp:   rgba(255, 255, 255, 0.14);
+      --border-active:  rgba(245, 158, 11, 0.45);
+
+      /* Pure Amber & Warm Gold Accents */
+      --amber-core:     #f59e0b;  /* Primary Amber Gold */
+      --amber-bright:   #fbbf24;  /* Bright Gold */
+      --amber-glow:     rgba(245, 158, 11, 0.2);
+      --amber-dark:     #b45309;  /* Deep Ochre */
+
+      /* Pure Forest Emerald for Clean / Healthy */
+      --green-clean:    #10b981;  /* Low Risk / Clean */
+      --green-bright:   #34d399;  /* Emerald */
+      --green-glow:     rgba(16, 185, 129, 0.18);
+
+      /* Pure Crimson & Vermilion for High Risk / Warnings */
+      --red-risk:       #ef4444;  /* High / Critical Defect Risk */
+      --red-bright:     #f87171;  /* Bright Crimson */
+      --red-glow:       rgba(239, 68, 68, 0.2);
+      --orange-warn:    #f97316;  /* Moderate Risk / Notice */
+
+      /* Typography (Warm Neutral Stone & Bone White) */
+      --text-primary:   #f5f5f4;  /* Bone White */
+      --text-secondary: #a8a29e;  /* Warm Stone Secondary */
+      --text-muted:     #78716c;  /* Warm Muted Neutral */
+
+      --font-ui:        'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-display:   'Space Grotesk', sans-serif;
+      --font-code:      'JetBrains Mono', Consolas, monospace;
+
+      --radius-sm:      4px;
+      --radius-md:      6px;
+      --radius-lg:      8px;
+
+      --titlebar-h:     42px;
+      --statusbar-h:    26px;
+      --rail-w:         46px;
+      --sidebar-w:      250px;
+      --panel-w:        350px;
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0; padding: 0;
+    }
+
+    html, body {
+      width: 100vw; height: 100vh;
+      overflow: hidden;
+      background: var(--bg-canvas);
+      color: var(--text-primary);
+      font-family: var(--font-ui);
+      font-size: 12.5px;
+      line-height: 1.5;
+      user-select: none;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Force native standard mouse cursor */
+    * { cursor: auto; }
+    button, a, select, input[type="file"], .tree-item, .tab-item, .rail-btn, .btn-tool {
+      cursor: pointer !important;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════════════════════
+       WINDOW SHELL LAYOUT
+       ═══════════════════════════════════════════════════════════════════════════════ */
+    #app-shell {
+      display: flex;
+      flex-direction: column;
+      width: 100vw;
+      height: 100vh;
+    }
+
+    /* ── Precision Titlebar ── */
+    #titlebar {
+      height: var(--titlebar-h);
+      background: var(--bg-surface);
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      padding: 0 14px;
+      gap: 12px;
+      flex-shrink: 0;
+      z-index: 100;
+    }
+
+    .brand-mark {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      text-decoration: none;
+      color: var(--text-primary);
+    }
+    .brand-icon {
+      width: 22px; height: 22px;
+      border-radius: var(--radius-sm);
+      background: linear-gradient(135deg, #f59e0b, #b45309);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #0d0d0d;
+      font-weight: 800;
+      font-family: var(--font-display);
+      font-size: 13px;
+      box-shadow: 0 0 10px var(--amber-glow);
+    }
+    .brand-title {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 14px;
+      letter-spacing: -0.02em;
+    }
+    .brand-title span { color: var(--amber-core); }
+
+    .title-sep {
+      width: 1px; height: 16px;
+      background: var(--border-subtle);
+    }
+
+    .repo-chip {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--bg-input);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      padding: 4px 10px;
+      font-family: var(--font-code);
+      font-size: 11px;
+      color: var(--text-secondary);
+    }
+    .repo-chip svg { width: 13px; height: 13px; color: var(--amber-core); }
+
+    .branch-select {
+      background: var(--bg-input);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      color: var(--text-secondary);
+      font-family: var(--font-code);
+      font-size: 11px;
+      padding: 3px 8px;
+      outline: none;
+    }
+    .branch-select:focus { border-color: var(--amber-core); }
+
+    .title-spacer { flex: 1; }
+
+    /* Action Buttons */
+    .btn-tool {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      color: var(--text-primary);
+      font-size: 11.5px;
+      font-weight: 500;
+      padding: 4px 11px;
+      transition: all 0.15s ease;
+    }
+    .btn-tool:hover {
+      background: var(--bg-card-hover);
+      border-color: var(--border-crisp);
+    }
+    .btn-tool svg { width: 13px; height: 13px; color: var(--amber-core); }
+
+    .btn-primary-tool {
+      background: #262015;
+      border-color: rgba(245, 158, 11, 0.4);
+      color: var(--amber-core);
+    }
+    .btn-primary-tool:hover {
+      background: #332b1c;
+      border-color: var(--amber-core);
+      box-shadow: 0 0 10px var(--amber-glow);
+    }
+
+    .btn-github-auth {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #1c1917;
+      border: 1px solid rgba(245, 245, 244, 0.12);
+      border-radius: var(--radius-sm);
+      color: var(--text-primary);
+      font-size: 11px;
+      font-weight: 600;
+      padding: 4px 10px;
+      text-decoration: none;
+      transition: all 0.15s ease;
+    }
+    .btn-github-auth:hover { background: #292524; border-color: var(--border-crisp); }
+    .btn-github-auth svg { width: 13px; height: 13px; fill: currentColor; }
+
+    .user-profile-badge {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 3px 8px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      font-size: 11.5px;
+    }
+    .user-profile-avatar { width: 18px; height: 18px; border-radius: 50%; object-fit: cover; }
+    .btn-logout { background: none; border: none; color: var(--red-risk); font-size: 11px; margin-left: 4px; }
+
+    /* ═══════════════════════════════════════════════════════════════════════════════
+       BODY WORKBENCH (RAIL + SIDEBAR + EDITOR + INTEL PANEL)
+       ═══════════════════════════════════════════════════════════════════════════════ */
+    #workbench {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* ── Activity Rail (Far Left) ── */
+    #activity-rail {
+      width: var(--rail-w);
+      background: var(--bg-rail);
+      border-right: 1px solid var(--border-subtle);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 10px 0;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+    .rail-btn {
+      width: 32px; height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: var(--radius-sm);
+      color: var(--text-muted);
+      background: transparent;
+      border: none;
+      position: relative;
+      transition: color 0.15s ease;
+    }
+    .rail-btn svg { width: 16px; height: 16px; }
+    .rail-btn:hover { color: var(--text-primary); }
+    .rail-btn.active {
+      color: var(--amber-core);
+      background: rgba(245, 158, 11, 0.1);
+    }
+    .rail-btn.active::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 6px; bottom: 6px;
+      width: 2px;
+      background: var(--amber-core);
+      border-radius: 0 2px 2px 0;
+      box-shadow: 0 0 8px var(--amber-core);
+    }
+    .rail-spacer { flex: 1; }
+
+    /* ── Sidebar Explorer ── */
+    #sidebar {
+      width: var(--sidebar-w);
+      background: var(--bg-surface);
+      border-right: 1px solid var(--border-subtle);
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+      overflow: hidden;
+    }
+    .sidebar-top {
+      height: 34px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 12px;
+      border-bottom: 1px solid var(--border-subtle);
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-muted);
+    }
+    .sidebar-actions { display: flex; gap: 4px; }
+    .icon-action-btn {
+      background: none; border: none; color: var(--text-muted);
+      width: 20px; height: 20px;
+      display: flex; align-items: center; justify-content: center;
+      border-radius: var(--radius-sm);
+    }
+    .icon-action-btn:hover { color: var(--text-primary); background: var(--bg-card); }
+    .icon-action-btn svg { width: 13px; height: 13px; }
+
+    .sidebar-scroll {
+      flex: 1;
+      overflow-y: auto;
+      padding: 10px 6px;
+    }
+
+    .group-label {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-muted);
+      padding: 6px 8px 4px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .tree-item {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      padding: 5px 8px;
+      border-radius: var(--radius-sm);
+      color: var(--text-secondary);
+      font-family: var(--font-code);
+      font-size: 11.5px;
+      transition: all 0.12s ease;
+    }
+    .tree-item:hover {
+      background: var(--bg-card);
+      color: var(--text-primary);
+    }
+    .tree-item.active {
+      background: rgba(245, 158, 11, 0.12);
+      color: var(--amber-core);
+      font-weight: 600;
+    }
+    .tree-item svg { width: 14px; height: 14px; flex-shrink: 0; }
+    .tree-tag {
+      margin-left: auto;
+      font-size: 9px;
+      font-weight: 700;
+      padding: 1px 5px;
+      border-radius: 3px;
+      text-transform: uppercase;
+    }
+    .tree-tag-clean { background: var(--green-glow); color: var(--green-clean); }
+    .tree-tag-warn { background: var(--amber-glow); color: var(--amber-core); }
+    .tree-tag-high { background: var(--red-glow); color: var(--red-risk); }
+
+    /* ── Center Editor Area ── */
+    #editor-area {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      background: var(--bg-canvas);
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* Tabs Bar */
+    #editor-tabs {
+      height: 34px;
+      background: var(--bg-rail);
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: stretch;
+      overflow-x: auto;
+    }
+    .tab-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 0 14px;
+      background: var(--bg-surface);
+      border-right: 1px solid var(--border-subtle);
+      border-top: 2px solid transparent;
+      color: var(--text-secondary);
+      font-family: var(--font-code);
+      font-size: 11.5px;
+      transition: all 0.12s ease;
+    }
+    .tab-item.active {
+      background: var(--bg-canvas);
+      color: var(--text-primary);
+      border-top-color: var(--amber-core);
+      font-weight: 600;
+    }
+    .tab-item svg { width: 13px; height: 13px; color: var(--amber-core); }
+    .tab-close {
+      margin-left: 6px;
+      opacity: 0.5;
+      font-size: 14px;
+      line-height: 1;
+    }
+    .tab-close:hover { opacity: 1; color: var(--red-risk); }
+
+    /* Breadcrumbs */
+    #breadcrumbs {
+      height: 26px;
+      background: var(--bg-canvas);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+      display: flex;
+      align-items: center;
+      padding: 0 14px;
+      gap: 6px;
+      font-family: var(--font-code);
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+    .crumb-part { color: var(--text-secondary); }
+
+    .crumb-risk-chip {
+      margin-left: auto;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: var(--radius-sm);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .chip-clean { background: var(--green-glow); color: var(--green-clean); border: 1px solid rgba(16, 185, 129, 0.3); }
+    .chip-med { background: var(--amber-glow); color: var(--amber-core); border: 1px solid rgba(245, 158, 11, 0.3); }
+    .chip-high { background: var(--red-glow); color: var(--red-risk); border: 1px solid rgba(239, 68, 68, 0.3); }
+
+    /* Monaco Mount */
+    #monaco-viewport {
+      flex: 1;
+      width: 100%;
+      position: relative;
+    }
+    #editor-placeholder {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      color: var(--text-muted);
+      pointer-events: none;
+    }
+    #editor-placeholder svg { width: 44px; height: 44px; opacity: 0.25; color: var(--amber-core); }
+
+    /* ── Right Intelligence Panel ── */
+    #intel-panel {
+      width: var(--panel-w);
+      background: var(--bg-surface);
+      border-left: 1px solid var(--border-subtle);
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+      overflow: hidden;
+    }
+
+    .intel-tabs {
+      display: flex;
+      border-bottom: 1px solid var(--border-subtle);
+      background: var(--bg-rail);
+    }
+    .intel-tab-btn {
+      flex: 1;
+      padding: 8px 10px;
+      text-align: center;
+      font-size: 11.5px;
+      font-weight: 600;
+      color: var(--text-muted);
+      border: none;
+      background: transparent;
+      border-bottom: 2px solid transparent;
+      transition: all 0.12s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+    .intel-tab-btn svg { width: 13px; height: 13px; }
+    .intel-tab-btn:hover { color: var(--text-primary); }
+    .intel-tab-btn.active {
+      color: var(--amber-core);
+      border-bottom-color: var(--amber-core);
+      background: var(--bg-surface);
+    }
+
+    .intel-content-pane {
+      flex: 1;
+      overflow-y: auto;
+      padding: 14px;
+      display: none;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .intel-content-pane.active { display: flex; }
+
+    /* Cards */
+    .intel-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 12px;
+    }
+    .intel-card-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+    }
+    .intel-card-head svg { width: 13px; height: 13px; color: var(--amber-core); }
+
+    /* ── Linear Warm Phosphor Risk Meter ── */
+    .phosphor-meter-box {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .meter-kpi-row {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+    }
+    .meter-pct {
+      font-family: var(--font-display);
+      font-size: 26px;
+      font-weight: 800;
+      line-height: 1;
+      color: var(--green-clean);
+    }
+    .meter-tier-badge {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      padding: 2px 7px;
+      border-radius: var(--radius-sm);
+    }
+
+    /* Calibrated Phosphor Bar */
+    .phosphor-track {
+      width: 100%;
+      height: 8px;
+      background: rgba(0, 0, 0, 0.5);
+      border-radius: 4px;
+      overflow: hidden;
+      position: relative;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+    .phosphor-bar-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #10b981, #f59e0b 60%, #ef4444);
+      border-radius: 4px;
+      transition: width 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow: 0 0 8px rgba(245, 158, 11, 0.35);
+    }
+
+    .meter-caption {
+      font-size: 11px;
+      color: var(--text-secondary);
+      line-height: 1.4;
+    }
+
+    /* ── 6-Cell Telemetry Matrix ── */
+    .telemetry-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+    }
+    .telemetry-cell {
+      background: var(--bg-input);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      padding: 7px 9px;
+      transition: border-color 0.15s ease;
+    }
+    .telemetry-cell:hover { border-color: var(--border-crisp); }
+    .telemetry-lbl {
+      font-size: 9.5px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+    }
+    .telemetry-val {
+      font-family: var(--font-code);
+      font-size: 13.5px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-top: 1px;
+    }
+
+    /* ── Architectural Smells List ── */
+    .smell-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--bg-input);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      padding: 7px 10px;
+      font-size: 11.5px;
+    }
+    .smell-left { display: flex; align-items: center; gap: 7px; }
+    .smell-indicator { width: 6px; height: 6px; border-radius: 50%; }
+    .ind-clean { background: var(--green-clean); box-shadow: 0 0 6px var(--green-clean); }
+    .ind-warn  { background: var(--amber-core); box-shadow: 0 0 6px var(--amber-core); }
+
+    /* ── Statusbar (Bottom) ── */
+    #statusbar {
+      height: var(--statusbar-h);
+      background: var(--bg-rail);
+      border-top: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      padding: 0 12px;
+      font-family: var(--font-code);
+      font-size: 10.5px;
+      color: var(--text-muted);
+      gap: 14px;
+      flex-shrink: 0;
+    }
+    .status-node { display: flex; align-items: center; gap: 5px; }
+    .status-dot { width: 5px; height: 5px; border-radius: 50%; }
+    .dot-live { background: var(--green-clean); box-shadow: 0 0 6px var(--green-clean); }
+
+    /* Toast Notification */
+    #toast-msg {
+      position: fixed;
+      bottom: 36px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: var(--bg-card);
+      border: 1px solid var(--border-crisp);
+      border-radius: var(--radius-sm);
+      padding: 8px 14px;
+      font-size: 11.5px;
+      color: var(--text-primary);
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.2s ease;
+      z-index: 500;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+    }
+    #toast-msg.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  </style>
+</head>
+<body>
+
+<div id="app-shell">
+  <!-- Hidden File Picker -->
+  <input type="file" id="file-picker" style="display:none" onchange="handleFilePicked(event)"/>
+
+  <!-- ── Top Precision Header ── -->
+  <header id="titlebar">
+    <a class="brand-mark" href="/ui/index.html">
+      <div class="brand-icon">S</div>
+      <div class="brand-title">SmellPredict <span>IDE</span></div>
+    </a>
+
+    <div class="title-sep"></div>
+
+    <div class="repo-chip">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+      <span id="repo-label">Local Workspace</span>
+    </div>
+
+    <select class="branch-select" id="branch-picker" style="display:none" onchange="switchBranch()"></select>
+
+    <div class="title-spacer"></div>
+
+    <button class="btn-tool" onclick="triggerFilePicker()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+      Open File
+    </button>
+
+    <button class="btn-tool btn-primary-tool" onclick="openCommitModal()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/></svg>
+      Commit Diff
+    </button>
+
+    <a class="btn-github-auth" id="github-auth-btn" href="/auth/github">
+      <svg viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+      Sign in GitHub
+    </a>
+
+    <div class="user-profile-badge" id="user-badge" style="display:none">
+      <img id="user-avatar-img" class="user-profile-avatar" src="" alt="Avatar"/>
+      <span id="user-name-txt"></span>
+      <button class="btn-logout" onclick="logout()">Exit</button>
+    </div>
+  </header>
+
+  <!-- ── Main Workbench ── -->
+  <div id="workbench">
+    
+    <!-- 1. Far Left Activity Rail -->
+    <nav id="activity-rail">
+      <button class="rail-btn active" title="Explorer (Files & Templates)" onclick="toggleSidebar('explorer')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+      </button>
+      <button class="rail-btn" title="Defect Intelligence Panel" onclick="focusIntelPane('analysis')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+      </button>
+      <button class="rail-btn" title="Team Review Notes" onclick="focusIntelPane('comments')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      </button>
+
+      <div class="rail-spacer"></div>
+
+      <button class="rail-btn" title="API Docs & Health" onclick="window.open('/docs','_blank')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+      </button>
+    </nav>
+
+    <!-- 2. Sidebar Explorer -->
+    <aside id="sidebar">
+      <div class="sidebar-top">
+        <span id="sb-view-title">Explorer</span>
+        <div class="sidebar-actions">
+          <button class="icon-action-btn" title="Upload Local File" onclick="triggerFilePicker()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="sidebar-scroll">
+        <!-- Interactive Templates -->
+        <div class="group-label">Code Samples & Presets</div>
+        
+        <div class="tree-item active" id="tree-clean" onclick="loadSample('clean')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          <span>clean_service.py</span>
+          <span class="tree-tag tree-tag-clean">Clean</span>
+        </div>
+
+        <div class="tree-item" id="tree-godclass" onclick="loadSample('godclass')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          <span>god_class_smelly.py</span>
+          <span class="tree-tag tree-tag-high">High Risk</span>
+        </div>
+
+        <div class="tree-item" id="tree-nesting" onclick="loadSample('nesting')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          <span>deep_nesting.py</span>
+          <span class="tree-tag tree-tag-warn">Moderate</span>
+        </div>
+
+        <div class="tree-item" id="tree-java" onclick="loadSample('java')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#eab308" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          <span>PaymentProcessor.java</span>
+          <span class="tree-tag" style="background:rgba(234,179,8,0.15);color:var(--amber-bright)">Java</span>
+        </div>
+
+        <!-- GitHub Remote Repos -->
+        <div class="group-label" style="margin-top:14px;">
+          <span>GitHub Repositories</span>
+          <span id="repo-count" style="font-size:9px;color:var(--amber-core);"></span>
+        </div>
+        <div id="github-tree-wrap">
+          <div style="padding:10px 8px;font-size:11px;color:var(--text-muted);line-height:1.6;">
+            Sign in with GitHub in the top-right to inspect remote branches and repositories.
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- 3. Center Editor Canvas -->
+    <main id="editor-area">
+      <div id="editor-tabs">
+        <div class="tab-item active">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/></svg>
+          <span id="active-tab-name">clean_service.py</span>
+        </div>
+      </div>
+
+      <div id="breadcrumbs">
+        <span>workspace</span>
+        <span>/</span>
+        <span class="crumb-part" id="crumb-filename">clean_service.py</span>
+        <div class="crumb-risk-chip chip-clean" id="crumb-risk-chip">Low Risk · 0%</div>
+      </div>
+
+      <!-- Monaco Viewport Mount -->
+      <div id="monaco-viewport">
+        <div id="editor-placeholder">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          <span>Initializing Monaco Diagnostics Engine...</span>
+        </div>
+      </div>
+    </main>
+
+    <!-- 4. Right Intelligence Panel -->
+    <aside id="intel-panel">
+      <div class="intel-tabs">
+        <button class="intel-tab-btn active" id="tab-btn-analysis" onclick="switchIntelTab('analysis')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+          Analysis
+        </button>
+        <button class="intel-tab-btn" id="tab-btn-chat" onclick="switchIntelTab('chat')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          Team Chat
+        </button>
+        <button class="intel-tab-btn" id="tab-btn-comments" onclick="switchIntelTab('comments')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/></svg>
+          Review Notes
+        </button>
+      </div>
+
+      <!-- Pane: Analysis -->
+      <div class="intel-content-pane active" id="pane-analysis">
+        <!-- Amber Phosphor Risk Meter Card -->
+        <div class="intel-card">
+          <div class="intel-card-head">
+            <span>Bug-Fix Risk Probability</span>
+            <span style="font-size:10px;color:var(--amber-core)">Calibrated Prior</span>
+          </div>
+
+          <div class="phosphor-meter-box">
+            <div class="meter-kpi-row">
+              <span class="meter-pct" id="risk-pct-txt">0%</span>
+              <span class="meter-tier-badge chip-clean" id="risk-tier-badge">Low Risk</span>
+            </div>
+
+            <div class="phosphor-track">
+              <div class="phosphor-bar-fill" id="phosphor-bar"></div>
+            </div>
+
+            <div class="meter-caption" id="risk-caption-txt">
+              Clean architectural indicators. Low probability of future defect bug-fix.
+            </div>
+          </div>
+        </div>
+
+        <!-- 6-Cell Telemetry Matrix -->
+        <div class="intel-card">
+          <div class="intel-card-head">
+            <span>Technical Telemetry</span>
+          </div>
+          <div class="telemetry-grid">
+            <div class="telemetry-cell">
+              <div class="telemetry-lbl">Lines of Code</div>
+              <div class="telemetry-val" id="m-loc">0</div>
+            </div>
+            <div class="telemetry-cell">
+              <div class="telemetry-lbl">Max Complexity</div>
+              <div class="telemetry-val" id="m-comp">1.0</div>
+            </div>
+            <div class="telemetry-cell">
+              <div class="telemetry-lbl">Max Nesting</div>
+              <div class="telemetry-val" id="m-nest">0</div>
+            </div>
+            <div class="telemetry-cell">
+              <div class="telemetry-lbl">Functions</div>
+              <div class="telemetry-val" id="m-fn">0</div>
+            </div>
+            <div class="telemetry-cell">
+              <div class="telemetry-lbl">Maintainability</div>
+              <div class="telemetry-val" id="m-mi" style="color:var(--green-clean)">100</div>
+            </div>
+            <div class="telemetry-cell">
+              <div class="telemetry-lbl">Cognitive Load</div>
+              <div class="telemetry-val" id="m-cog">0</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Architectural Smells -->
+        <div class="intel-card">
+          <div class="intel-card-head">
+            <span>Detected Smells (AST)</span>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:6px;" id="smells-list-wrap">
+            <div class="smell-row">
+              <div class="smell-left"><div class="smell-indicator ind-clean"></div><span>Long Method</span></div>
+              <span style="font-size:10px;color:var(--green-clean);font-weight:700">CLEAN</span>
+            </div>
+            <div class="smell-row">
+              <div class="smell-left"><div class="smell-indicator ind-clean"></div><span>Long Param List</span></div>
+              <span style="font-size:10px;color:var(--green-clean);font-weight:700">CLEAN</span>
+            </div>
+            <div class="smell-row">
+              <div class="smell-left"><div class="smell-indicator ind-clean"></div><span>Deep Nesting</span></div>
+              <span style="font-size:10px;color:var(--green-clean);font-weight:700">CLEAN</span>
+            </div>
+            <div class="smell-row">
+              <div class="smell-left"><div class="smell-indicator ind-clean"></div><span>Large Class</span></div>
+              <span style="font-size:10px;color:var(--green-clean);font-weight:700">CLEAN</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pane: Chat -->
+      <div class="intel-content-pane" id="pane-chat">
+        <div id="chat-messages" style="flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:8px;">
+          <div style="background:var(--bg-input);padding:8px 10px;border-radius:4px;border:1px solid var(--border-subtle)">
+            <div style="font-size:10px;color:var(--amber-core);font-weight:700;margin-bottom:3px">SmellPredict Bot</div>
+            <div style="font-size:11.5px;color:var(--text-secondary)">Collaborative room initialized. Messages are synchronized across peers.</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:6px;margin-top:auto;">
+          <input type="text" id="chat-input" placeholder="Type team message..." 
+            style="flex:1;background:var(--bg-input);border:1px solid var(--border-subtle);border-radius:4px;padding:6px 9px;color:var(--text-primary);font-size:11.5px;outline:none;"
+            onkeydown="if(event.key==='Enter') sendChatMessage()"/>
+          <button class="btn-tool" onclick="sendChatMessage()">Send</button>
+        </div>
+      </div>
+
+      <!-- Pane: Review Notes -->
+      <div class="intel-content-pane" id="pane-comments">
+        <div id="comments-list" style="flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:8px;">
+          <div style="font-size:11px;color:var(--text-muted);text-align:center;padding:20px 0;">
+            No line review notes yet.<br/>Click any line margin in Monaco to anchor a note.
+          </div>
+        </div>
+      </div>
+    </aside>
+
+  </div>
+
+  <!-- ── Precision Statusbar ── -->
+  <footer id="statusbar">
+    <div class="status-node">
+      <div class="status-dot dot-live"></div>
+      <span id="sb-status-text">Engine Ready</span>
+    </div>
+    <div class="status-node" id="sb-latency">12ms inference</div>
+    <div class="title-spacer"></div>
+    <div class="status-node" id="sb-lang-node">PYTHON</div>
+    <div class="status-node">UTF-8</div>
+    <div class="status-node" id="sb-room-node">Room: main</div>
+  </footer>
+</div>
+
+<!-- Toast Container -->
+<div id="toast-msg">✓ Action completed</div>
+
+<!-- Monaco Loader -->
+<script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.48.0/min/vs/loader.js"></script>
+
+<script>
+// ═══════════════════════════════════════════════════════════════════════════════
+// STATE MANAGEMENT & SAMPLE PRESETS
+// ═══════════════════════════════════════════════════════════════════════════════
+let editor = null;
+let currentFilename = 'clean_service.py';
+let currentLanguage = 'python';
+let currentContent = '';
+let analysisTimer = null;
+let jwt = localStorage.getItem('sp_jwt') || null;
+let currentRepo = null;
+let currentBranch = 'main';
+
+const LANG_MAP = {
+  py: 'python', java: 'java', js: 'javascript', ts: 'typescript',
+  go: 'go', rs: 'rust', cpp: 'cpp', c: 'c', html: 'html', css: 'css', json: 'json'
+};
+
+const SAMPLES = {
+  clean: {
+    filename: 'clean_service.py',
+    lang: 'python',
+    code: `"""
+Clean Authentication Service
+Adheres strictly to SOLID principles, single responsibility, and clean interfaces.
+"""
+from dataclasses import dataclass
+from typing import Optional
+
+@dataclass
+class UserSession:
+    user_id: str
+    token: str
+    is_admin: bool = False
+
+class AuthService:
+    def __init__(self, token_provider, user_store):
+        self.token_provider = token_provider
+        self.user_store = user_store
+
+    def authenticate(self, username: str, secret: str) -> Optional[UserSession]:
+        user = self.user_store.get_by_credentials(username, secret)
+        if not user:
+            return None
+        token = self.token_provider.generate_token(user.id)
+        return UserSession(user_id=user.id, token=token, is_admin=user.is_admin)
+`
+  },
+  godclass: {
+    filename: 'god_class_smelly.py',
+    lang: 'python',
+    code: `"""
+Monolithic Legacy Manager (God Class & Long Method Smell)
+Violates single responsibility with bloated state and long parameter list.
+"""
+class SystemManager:
+    def __init__(self, db_conn, cache_client, logger, metrics_sink, email_gateway, s3_bucket):
+        self.db = db_conn
+        self.cache = cache_client
+        self.logger = logger
+        self.metrics = metrics_sink
+        self.email = email_gateway
+        self.s3 = s3_bucket
+
+    def process_and_reconcile_everything(self, tx_id, user_id, amount, currency, timestamp, payload, dry_run=False):
+        self.logger.info(f"Starting transaction processing for {tx_id}")
+        self.metrics.increment("tx.attempt")
+        
+        # Long Method Block
+        record = self.db.query("SELECT * FROM transactions WHERE id = %s", tx_id)
+        if not record:
+            self.logger.error("Transaction not found")
+            return False
+            
+        validated = False
+        if record.status == 'PENDING':
+            if amount > 0:
+                if currency in ['USD', 'EUR', 'GBP']:
+                    if self.cache.exists(f"lock_{user_id}"):
+                        self.logger.warn("Account is locked")
+                        return False
+                    else:
+                        validated = True
+                        
+        if validated:
+            self.db.execute("UPDATE transactions SET status = 'COMPLETED' WHERE id = %s", tx_id)
+            self.email.send(user_id, f"Transaction {tx_id} completed successfully.")
+            self.s3.upload_log(f"tx_{tx_id}.json", payload)
+            self.metrics.increment("tx.success")
+            return True
+        return False
+`
+  },
+  nesting: {
+    filename: 'deep_nesting.py',
+    lang: 'python',
+    code: `"""
+Deep Nesting & Complex Dispatcher
+Exceeds recommended nesting depth and cyclomatic complexity thresholds.
+"""
+def dispatch_event(event, handlers, security_policy, audit_logger):
+    if event is not None:
+        if event.get('type') == 'WEBHOOK':
+            if security_policy.verify_signature(event.get('signature')):
+                payload = event.get('payload', {})
+                if 'target' in payload:
+                    for handler in handlers:
+                        if handler.can_handle(payload['target']):
+                            if handler.is_enabled():
+                                try:
+                                    handler.execute(payload)
+                                    audit_logger.log_success(event['id'])
+                                except Exception as err:
+                                    audit_logger.log_failure(event['id'], err)
+                            else:
+                                audit_logger.log_skip(event['id'])
+`
+  },
+  java: {
+    filename: 'PaymentProcessor.java',
+    lang: 'java',
+    code: `package com.smellpredict.payment;
+
+import java.util.*;
+import java.util.concurrent.*;
+
+public class PaymentOrderProcessor {
+    private final Map<String, Object> registry = new ConcurrentHashMap<>();
+
+    public boolean executeOrder(String orderId, double amount, String customerId, String currency, String routingCode, boolean isExpress) {
+        if (orderId != null && !orderId.isEmpty()) {
+            if (amount > 0.0) {
+                if (customerId != null) {
+                    if (currency.equalsIgnoreCase("USD")) {
+                        registry.put(orderId, amount);
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+}
+`
+  }
+};
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// TOAST & UI HELPERS
+// ═══════════════════════════════════════════════════════════════════════════════
+function showToast(msg) {
+  const el = document.getElementById('toast-msg');
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 2500);
+}
+
+function switchIntelTab(tabId) {
+  document.querySelectorAll('.intel-tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.intel-content-pane').forEach(p => p.classList.remove('active'));
+  const btn = document.getElementById('tab-btn-' + tabId);
+  const pane = document.getElementById('pane-' + tabId);
+  if (btn) btn.classList.add('active');
+  if (pane) pane.classList.add('active');
+}
+
+function focusIntelPane(tabId) {
+  switchIntelTab(tabId);
+}
+
+function toggleSidebar(view) {
+  const sb = document.getElementById('sidebar');
+  sb.style.display = sb.style.display === 'none' ? 'flex' : 'none';
+}
+
+function triggerFilePicker() {
+  document.getElementById('file-picker').click();
+}
+
+function handleFilePicked(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (re) => {
+    const content = re.target.result;
+    const fname = file.name;
+    const ext = fname.split('.').pop().toLowerCase();
+    const lang = LANG_MAP[ext] || 'plaintext';
+
+    currentFilename = fname;
+    currentLanguage = lang;
+    currentContent = content;
+
+    document.getElementById('active-tab-name').textContent = fname;
+    document.getElementById('crumb-filename').textContent = fname;
+    document.getElementById('sb-lang-node').textContent = lang.toUpperCase();
+
+    if (editor) {
+      const model = monaco.editor.createModel(content, lang);
+      const old = editor.getModel();
+      editor.setModel(model);
+      if (old) old.dispose();
+      triggerAnalysis();
+    }
+    showToast(`✓ Loaded ${fname}`);
+  };
+  reader.readAsText(file);
+}
+
+function loadSample(key) {
+  const s = SAMPLES[key];
+  if (!s) return;
+  document.querySelectorAll('.tree-item').forEach(i => i.classList.remove('active'));
+  const el = document.getElementById('tree-' + key);
+  if (el) el.classList.add('active');
+
+  currentFilename = s.filename;
+  currentLanguage = s.lang;
+  currentContent = s.code.trim();
+
+  document.getElementById('active-tab-name').textContent = s.filename;
+  document.getElementById('crumb-filename').textContent = s.filename;
+  document.getElementById('sb-lang-node').textContent = s.lang.toUpperCase();
+
+  if (editor) {
+    const model = monaco.editor.createModel(currentContent, s.lang);
+    const old = editor.getModel();
+    editor.setModel(model);
+    if (old) old.dispose();
+    triggerAnalysis();
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// MONACO EDITOR WITH PURE WARM AMBER & OBSIDIAN THEME (NO BLUE / NO PURPLE)
+// ═══════════════════════════════════════════════════════════════════════════════
+function initMonaco() {
+  require.config({ paths: { vs: 'https://cdn.jsdelivr.net/npm/monaco-editor@0.48.0/min/vs' } });
+  require(['vs/editor/editor.main'], () => {
+    
+    // Handcrafted Warm Obsidian & Amber Theme
+    monaco.editor.defineTheme('warm-amber-obsidian', {
+      base: 'vs-dark',
+      inherit: true,
+      rules: [
+        { token: 'comment', foreground: '78716c', fontStyle: 'italic' },
+        { token: 'keyword', foreground: 'f59e0b', fontStyle: 'bold' },
+        { token: 'string', foreground: '10b981' },
+        { token: 'number', foreground: 'f97316' },
+        { token: 'type', foreground: 'eab308' },
+        { token: 'function', foreground: 'fbbf24' },
+        { token: 'variable', foreground: 'f5f5f4' },
+      ],
+      colors: {
+        'editor.background': '#0d0d0d',
+        'editor.foreground': '#f5f5f4',
+        'editorLineNumber.foreground': '#444444',
+        'editorLineNumber.activeForeground': '#f59e0b',
+        'editor.lineHighlightBackground': '#181818',
+        'editorCursor.foreground': '#f59e0b',
+        'editor.selectionBackground': '#332b1e',
+        'editorWidget.background': '#161616',
+        'editorWidget.border': 'rgba(255, 255, 255, 0.1)',
+        'minimap.background': '#0d0d0d',
+      }
+    });
+
+    const mount = document.getElementById('monaco-viewport');
+    document.getElementById('editor-placeholder').style.display = 'none';
+
+    editor = monaco.editor.create(mount, {
+      value: currentContent || SAMPLES.clean.code.trim(),
+      language: currentLanguage,
+      theme: 'warm-amber-obsidian',
+      fontSize: 13,
+      fontFamily: "'JetBrains Mono', Consolas, monospace",
+      fontLigatures: true,
+      lineNumbers: 'on',
+      glyphMargin: true,
+      minimap: { enabled: true },
+      scrollBeyondLastLine: false,
+      automaticLayout: true,
+      cursorBlinking: 'smooth',
+      cursorSmoothCaretAnimation: 'on',
+      smoothScrolling: true,
+      padding: { top: 12 },
+    });
+
+    // Keystroke debounced inference
+    editor.onDidChangeModelContent(() => {
+      clearTimeout(analysisTimer);
+      analysisTimer = setTimeout(triggerAnalysis, 350);
+      document.getElementById('sb-status-text').textContent = 'Analyzing AST...';
+    });
+
+    // Drag-and-drop file ingestion onto Monaco
+    mount.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      mount.style.boxShadow = 'inset 0 0 0 2px var(--amber-core)';
+    });
+    mount.addEventListener('dragleave', (e) => {
+      e.preventDefault();
+      mount.style.boxShadow = 'none';
+    });
+    mount.addEventListener('drop', (e) => {
+      e.preventDefault();
+      mount.style.boxShadow = 'none';
+      if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+        const file = e.dataTransfer.files[0];
+        const reader = new FileReader();
+        reader.onload = (re) => {
+          const content = re.target.result;
+          const fname = file.name;
+          const ext = fname.split('.').pop().toLowerCase();
+          const lang = LANG_MAP[ext] || 'plaintext';
+
+          currentFilename = fname;
+          currentLanguage = lang;
+          currentContent = content;
+
+          document.getElementById('active-tab-name').textContent = fname;
+          document.getElementById('crumb-filename').textContent = fname;
+          document.getElementById('sb-lang-node').textContent = lang.toUpperCase();
+
+          if (editor) {
+            const model = monaco.editor.createModel(content, lang);
+            const old = editor.getModel();
+            editor.setModel(model);
+            if (old) old.dispose();
+            triggerAnalysis();
+          }
+          showToast(`✓ Dropped & loaded ${fname}`);
+        };
+        reader.readAsText(file);
+      }
+    });
+
+    // Initial analysis
+    triggerAnalysis();
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// LIVE INFERENCE & DIAGNOSTICS
+// ═══════════════════════════════════════════════════════════════════════════════
+async function triggerAnalysis() {
+  if (!editor) return;
+  const content = editor.getValue();
+  const filename = currentFilename;
+  const t0 = performance.now();
+
+  try {
+    const res = await fetch('/api/v1/analyze/live', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ content, filename })
+    });
+
+    if (!res.ok) throw new Error('Analysis failed');
+    const data = await res.json();
+    const latency = Math.round(performance.now() - t0);
+
+    updateAnalysisView(data, latency);
+  } catch (err) {
+    document.getElementById('sb-status-text').textContent = 'Local Analysis Active';
+  }
+}
+
+function updateAnalysisView(data, latency) {
+  const prob = data.risk?.probability || 0;
+  const pct = Math.round(prob * 100);
+  const tier = data.risk?.tier || 'Low';
+
+  // Update Phosphor Bar
+  const bar = document.getElementById('phosphor-bar');
+  bar.style.width = pct + '%';
+
+  const pctEl = document.getElementById('risk-pct-txt');
+  pctEl.textContent = `${pct}%`;
+  pctEl.style.color = tier === 'High' || tier === 'Critical' ? 'var(--red-risk)' : tier === 'Medium' ? 'var(--amber-core)' : 'var(--green-clean)';
+
+  const badge = document.getElementById('risk-tier-badge');
+  badge.textContent = `${tier} Risk`;
+  badge.className = `meter-tier-badge ${tier === 'High' || tier === 'Critical' ? 'chip-high' : tier === 'Medium' ? 'chip-med' : 'chip-clean'}`;
+
+  const crumbChip = document.getElementById('crumb-risk-chip');
+  crumbChip.textContent = `${tier} Risk · ${pct}%`;
+  crumbChip.className = `crumb-risk-chip ${tier === 'High' || tier === 'Critical' ? 'chip-high' : tier === 'Medium' ? 'chip-med' : 'chip-clean'}`;
+
+  document.getElementById('risk-caption-txt').textContent = data.risk?.recommendation || 'Standard peer review recommended.';
+
+  // Technical Telemetry
+  const metrics = data.metrics || {};
+  document.getElementById('m-loc').textContent = metrics.loc || 0;
+  document.getElementById('m-comp').textContent = (metrics.max_cyclomatic_complexity || metrics.cyclomatic_complexity || 1).toFixed(1);
+  document.getElementById('m-nest').textContent = metrics.max_nesting_depth || 0;
+  document.getElementById('m-fn').textContent = metrics.function_count || 0;
+
+  const mi = Math.round(metrics.maintainability_index || 100);
+  const miEl = document.getElementById('m-mi');
+  miEl.textContent = mi;
+  miEl.style.color = mi > 65 ? 'var(--green-clean)' : mi > 40 ? 'var(--amber-core)' : 'var(--red-risk)';
+
+  document.getElementById('m-cog').textContent = metrics.cognitive_complexity || 0;
+
+  // Architectural Smells
+  const smells = data.smells || {};
+  const smellDefs = [
+    ['has_long_method', 'Long Method'],
+    ['has_long_param_list', 'Long Param List'],
+    ['has_deep_nesting', 'Deep Nesting'],
+    ['has_large_class', 'Large Class'],
+  ];
+
+  const smellsWrap = document.getElementById('smells-list-wrap');
+  smellsWrap.innerHTML = smellDefs.map(([key, label]) => {
+    const isWarn = Boolean(smells[key]);
+    const dotClass = isWarn ? 'ind-warn' : 'ind-clean';
+    const tagText = isWarn ? 'DETECTED' : 'CLEAN';
+    const tagColor = isWarn ? 'var(--amber-core)' : 'var(--green-clean)';
+    return `
+      <div class="smell-row">
+        <div class="smell-left">
+          <div class="smell-indicator ${dotClass}"></div>
+          <span>${label}</span>
+        </div>
+        <span style="font-size:10px;color:${tagColor};font-weight:700">${tagText}</span>
+      </div>
+    `;
+  }).join('');
+
+  // In-Editor Squiggly Diagnostics
+  if (editor && typeof monaco !== 'undefined') {
+    const model = editor.getModel();
+    if (model) {
+      const markers = [];
+      const refList = data.refactoring || [];
+      refList.forEach(item => {
+        const line = item.line_number || 1;
+        const maxCol = model.getLineMaxColumn(line) || 80;
+        markers.push({
+          startLineNumber: line,
+          startColumn: 1,
+          endLineNumber: line,
+          endColumn: maxCol,
+          message: `SmellPredict: ${item.title || item.smell_type} — ${item.suggested_action || item.description || 'Consider refactoring'}`,
+          severity: monaco.MarkerSeverity.Warning
+        });
+      });
+      monaco.editor.setModelMarkers(model, 'smellpredict', markers);
+    }
+  }
+
+  // Statusbar
+  document.getElementById('sb-status-text').textContent = 'Synchronized';
+  document.getElementById('sb-latency').textContent = `${latency}ms inference`;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// CHAT & GITHUB INTEGRATION
+// ═══════════════════════════════════════════════════════════════════════════════
+function sendChatMessage() {
+  const inp = document.getElementById('chat-input');
+  const txt = (inp.value || '').trim();
+  if (!txt) return;
+
+  const wrap = document.getElementById('chat-messages');
+  const bubble = document.createElement('div');
+  bubble.style.cssText = 'background:var(--bg-card);padding:8px 10px;border-radius:4px;border:1px solid var(--border-subtle);';
+  bubble.innerHTML = `
+    <div style="font-size:10px;color:var(--amber-core);font-weight:700;margin-bottom:3px">You · Just now</div>
+    <div style="font-size:11.5px;color:var(--text-primary);">${txt}</div>
+  `;
+  wrap.appendChild(bubble);
+  wrap.scrollTop = wrap.scrollHeight;
+  inp.value = '';
+}
+
+async function checkAuth() {
+  const params = new URLSearchParams(window.location.search);
+  const tokenFromUrl = params.get('token');
+  if (tokenFromUrl) {
+    jwt = tokenFromUrl;
+    localStorage.setItem('sp_jwt', jwt);
+    window.history.replaceState({}, document.title, window.location.pathname);
+  }
+
+  if (!jwt) return;
+
+  try {
+    const res = await fetch('/auth/me', { headers: { 'Authorization': `Bearer ${jwt}` } });
+    if (!res.ok) throw new Error('Auth invalid');
+    const user = await res.json();
+
+    document.getElementById('github-auth-btn').style.display = 'none';
+    const badge = document.getElementById('user-badge');
+    badge.style.display = 'flex';
+    document.getElementById('user-avatar-img').src = user.avatar_url;
+    document.getElementById('user-name-txt').textContent = user.username;
+
+    loadUserRepos();
+  } catch (e) {
+    localStorage.removeItem('sp_jwt');
+  }
+}
+
+async function loadUserRepos() {
+  if (!jwt) return;
+  try {
+    const res = await fetch('/github/repos', { headers: { 'Authorization': `Bearer ${jwt}` } });
+    if (!res.ok) return;
+    const data = await res.json();
+    const list = data.repositories || [];
+    document.getElementById('repo-count').textContent = `${list.length} repos`;
+
+    const wrap = document.getElementById('github-tree-wrap');
+    wrap.innerHTML = list.map(r => `
+      <div class="tree-item" onclick="openRepo('${r.full_name}')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+        <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${r.name}</span>
+      </div>
+    `).join('');
+  } catch (e) {}
+}
+
+function openCommitModal() {
+  showToast('✓ Staged changes ready for commit');
+}
+
+function logout() {
+  localStorage.removeItem('sp_jwt');
+  window.location.reload();
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// INITIALIZATION
+// ═══════════════════════════════════════════════════════════════════════════════
+window.addEventListener('DOMContentLoaded', () => {
+  initMonaco();
+  checkAuth();
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,247 @@
+# SmellPredict Mining Configuration
+# Controls repository mining, feature extraction, and snapshot sampling
+
+repositories:
+  # === Tier 1: Large, well-maintained (20+) ===
+  tier1:
+    - url: "https://github.com/pallets/flask"
+      name: "flask"
+    - url: "https://github.com/tiangolo/fastapi"
+      name: "fastapi"
+    - url: "https://github.com/psf/requests"
+      name: "requests"
+    - url: "https://github.com/scrapy/scrapy"
+      name: "scrapy"
+    - url: "https://github.com/pallets/click"
+      name: "click"
+    - url: "https://github.com/Textualize/rich"
+      name: "rich"
+    - url: "https://github.com/tiangolo/typer"
+      name: "typer"
+    - url: "https://github.com/encode/httpx"
+      name: "httpx"
+    - url: "https://github.com/celery/celery"
+      name: "celery"
+    - url: "https://github.com/pytest-dev/pytest"
+      name: "pytest"
+    - url: "https://github.com/psf/black"
+      name: "black"
+    - url: "https://github.com/astral-sh/ruff"
+      name: "ruff"
+    - url: "https://github.com/pallets/jinja"
+      name: "jinja2"
+    - url: "https://github.com/sqlalchemy/sqlalchemy"
+      name: "sqlalchemy"
+    - url: "https://github.com/django/django"
+      name: "django"
+    - url: "https://github.com/scikit-learn/scikit-learn"
+      name: "scikit-learn"
+    - url: "https://github.com/dmlc/xgboost"
+      name: "xgboost"
+    - url: "https://github.com/microsoft/LightGBM"
+      name: "lightgbm"
+    - url: "https://github.com/tox-dev/tox"
+      name: "tox"
+    - url: "https://github.com/pydantic/pydantic"
+      name: "pydantic"
+
+  # === Tier 2: Medium, diverse domains (15+) ===
+  tier2:
+    - url: "https://github.com/fabric/fabric"
+      name: "fabric"
+    - url: "https://github.com/paramiko/paramiko"
+      name: "paramiko"
+    - url: "https://github.com/python-pillow/Pillow"
+      name: "pillow"
+    - url: "https://github.com/arrow-py/arrow"
+      name: "arrow"
+    - url: "https://github.com/python-poetry/poetry"
+      name: "poetry"
+    - url: "https://github.com/pypa/pip"
+      name: "pip"
+    - url: "https://github.com/benoitc/gunicorn"
+      name: "gunicorn"
+    - url: "https://github.com/encode/uvicorn"
+      name: "uvicorn"
+    - url: "https://github.com/sphinx-doc/sphinx"
+      name: "sphinx"
+    - url: "https://github.com/python/mypy"
+      name: "mypy"
+    - url: "https://github.com/pylint-dev/pylint"
+      name: "pylint"
+    - url: "https://github.com/tornadoweb/tornado"
+      name: "tornado"
+    - url: "https://github.com/aio-libs/aiohttp"
+      name: "aiohttp"
+    - url: "https://github.com/boto/boto3"
+      name: "boto3"
+    - url: "https://github.com/pallets/werkzeug"
+      name: "werkzeug"
+
+  # === Tier 3: Smaller, focused (15+) ===
+  tier3:
+    - url: "https://github.com/tartley/colorama"
+      name: "colorama"
+      validation_only: true    # historically < 20 rows — too small for training folds
+    - url: "https://github.com/kennethreitz/records"
+      name: "records"
+      validation_only: true    # historically 3 rows — single-file library, useless for LOPO
+    - url: "https://github.com/burnash/gspread"
+      name: "gspread"
+    - url: "https://github.com/google/python-fire"
+      name: "python-fire"
+    - url: "https://github.com/tqdm/tqdm"
+      name: "tqdm"
+    - url: "https://github.com/python-attrs/attrs"
+      name: "attrs"
+    - url: "https://github.com/python-attrs/cattrs"
+      name: "cattrs"
+    - url: "https://github.com/marshmallow-code/marshmallow"
+      name: "marshmallow"
+    - url: "https://github.com/theskumar/python-dotenv"
+      name: "python-dotenv"
+      validation_only: true    # historically 14 rows
+    - url: "https://github.com/Delgan/loguru"
+      name: "loguru"
+    - url: "https://github.com/hynek/structlog"
+      name: "structlog"
+    - url: "https://github.com/jd/tenacity"
+      name: "tenacity"
+    - url: "https://github.com/litl/backoff"
+      name: "backoff"
+      validation_only: true    # historically 14 rows
+    - url: "https://github.com/dbader/schedule"
+      name: "schedule"
+      validation_only: true    # historically 10 rows
+    - url: "https://github.com/mahmoud/boltons"
+      name: "boltons"
+
+# === Mining Parameters ===
+mining:
+  # Evenly distribute samples across full commit history (matches java_miner.py)
+  snapshot_stride: 5             # Kept for compatibility; max_commits takes priority
+  max_commits: 500               # Cap per repo — evenly sampled from full history
+  min_commits: 50                # Skip repos with fewer commits
+  min_rows_for_training: 50      # Fix 0-I: repos producing fewer rows flagged exclude_from_training=1
+  # IMPORTANT: future_window is in DAYS (date-based), NOT commit count.
+  # Using commit-count caused 75%+ false-positive bug labels on active repos.
+  future_window_days: 90         # Look-ahead window: 90 calendar days (same as Java)
+  label_rate_min: 0.05           # Fix 0-I: repos below this rate flagged label_outlier=1
+  label_rate_max: 0.65           # Fix 0-I: repos above this rate flagged label_outlier=1
+  file_extensions:
+    - ".py"
+  exclude_patterns:
+    - "**/test_*.py"             # Test files (optional toggle)
+    - "**/tests/**"
+    - "**/migrations/**"         # Django/Alembic migrations
+    - "**/vendor/**"
+    - "**/venv/**"
+    - "**/node_modules/**"
+    - "**/__pycache__/**"
+    - "**/setup.py"              # Often auto-generated
+    - "**/conf.py"               # Sphinx config
+  max_file_size_kb: 500          # Skip files > 500KB (generated code)
+
+# === Rename Tracking ===
+rename_tracking:
+  enabled: true
+  similarity_threshold: 0.50
+  method: "git_log_follow"       # Uses git log --follow
+
+# === Performance ===
+performance:
+  num_threads: 4                 # PyDriller parallelism
+  batch_size: 5                  # Repos per processing batch
+  clone_method: "bare"           # Use --bare clones for speed
+  stream_to_storage: true        # Write to DuckDB/Parquet as we go
+
+# === Storage ===
+storage:
+  format: "parquet"              # Primary storage format
+  database: "data/smellpredict.duckdb"
+  raw_dir: "data/raw"
+  processed_dir: "data/processed"
+  labels_dir: "data/labels"
+  external_dir: "data/external"
+
+# === Bug-Fix Labeling Heuristic ===
+labeling:
+  # Exact weights from paper Equation (1)
+  keyword_weight: 0.20
+  issue_ref_weight: 0.15
+  strong_fix_weight: 0.25
+  noise_penalty: 0.15
+  score_threshold: 0.40
+  keywords:
+    - "fix"
+    - "fixed"
+    - "fixes"
+    - "fixing"
+    - "bug"
+    - "defect"
+    - "patch"
+    - "regression"
+    - "crash"
+    - "exception"
+    - "failure"
+    - "broken"
+    - "incorrect"
+    - "wrong"
+    - "error"
+    - "resolve"
+    - "resolved"
+    - "resolves"
+    - "resolving"
+    - "repair"
+    - "hotfix"
+  strong_patterns:
+    - "fix(es|ed|ing)?"
+    - "bug.?fix"
+    - "regression"
+    # NOTE: 'patch' removed — causes false positives on repos using
+    # Apache SVN-style "patch by X; reviewed by Y" commit messages.
+    - "crash"
+    - "defect"
+    - "null.?pointer"
+    - "npe"
+    - "deadlock"
+    - "memory.?leak"
+  noise_patterns:
+    - "merge"
+    - "format"
+    - "typo"
+    - "readme"
+    - "documentation"
+    - "docs"
+    - "refactor"
+    - "cleanup"
+    - "style"
+    - "lint"
+    # Apache SVN workflow noise
+    - "patch by"
+    - "reviewed by"
+    - "git-svn-id"
+    # Structural non-bug commits
+    - "move"
+    - "rename"
+    - "revert"
+    - "upgrade"
+    - "bump"
+
+# === Code Smell Thresholds ===
+smell_thresholds:
+  long_method:
+    default: 50
+    sensitivity: [30, 40, 50, 60, 80]
+  long_parameter_list:
+    default: 5
+    sensitivity: [3, 4, 5, 6, 8]
+  large_class:
+    default: 300
+    sensitivity: [200, 250, 300, 400, 500]
+  deep_nesting:
+    default: 4
+    sensitivity: [3, 4, 5, 6]
+  high_cyclomatic_complexity:
+    default: 10
+    sensitivity: [7, 8, 10, 12, 15]

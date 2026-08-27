@@ -1,0 +1,204 @@
+# SmellPredict Model Configuration
+# Controls training, evaluation, and hyperparameter search
+
+# === Validation Regimes ===
+validation:
+  temporal:
+    n_folds: 10
+    strategy: "expanding_window"       # train grows with each fold
+    enforce_chronological: true        # hard assertion
+    enforce_identity_exclusion: true   # hard assertion
+  lopo:
+    strategy: "leave_one_project_out"
+    rotate_all: true                   # all N rotations
+  inner_cv:
+    n_splits: 5                        # for hyperparameter tuning
+    strategy: "time_series_split"
+
+# === Feature Groups ===
+feature_groups:
+  A:
+    name: "Code only"
+    include: ["code_metrics"]
+  B:
+    name: "Code + History"
+    include: ["code_metrics", "history_metrics"]
+  C:
+    name: "Code + History + Smells"
+    include: ["code_metrics", "history_metrics", "smell_features"]
+  D:
+    name: "Smells only"
+    include: ["smell_features"]
+  E:
+    name: "Full pipeline"
+    include: ["code_metrics", "history_metrics", "smell_features", "structural_features"]
+
+# === Models ===
+models:
+  logistic_regression:
+    enabled: true
+    class: "sklearn.linear_model.LogisticRegression"
+    fixed_params:
+      max_iter: 5000
+      class_weight: "balanced"
+      solver: "saga"
+    search_space:
+      C: [0.001, 0.01, 0.1, 1.0, 10.0, 100.0]
+      penalty: ["l1", "l2", "elasticnet"]
+      l1_ratio: [0.1, 0.3, 0.5, 0.7, 0.9]  # only for elasticnet
+
+  random_forest:
+    enabled: true
+    class: "sklearn.ensemble.RandomForestClassifier"
+    fixed_params:
+      class_weight: "balanced_subsample"
+      n_jobs: -1
+      random_state: 42
+    search_space:
+      n_estimators: [100, 200, 300, 500]
+      max_depth: [5, 8, 12, 20, null]
+      min_samples_leaf: [1, 2, 5, 10]
+      max_features: ["sqrt", "log2", 0.3, 0.5]
+
+  xgboost:
+    enabled: true
+    class: "xgboost.XGBClassifier"
+    fixed_params:
+      eval_metric: "aucpr"
+      random_state: 42
+      n_jobs: -1
+      tree_method: "hist"
+    search_space:
+      n_estimators: [100, 300, 500, 800]
+      max_depth: [3, 4, 5, 6, 8]
+      learning_rate: [0.005, 0.01, 0.05, 0.1, 0.2]
+      subsample: [0.6, 0.7, 0.8, 1.0]
+      colsample_bytree: [0.6, 0.7, 0.8, 1.0]
+      min_child_weight: [1, 3, 5, 10]
+
+  lightgbm:
+    enabled: true
+    class: "lightgbm.LGBMClassifier"
+    fixed_params:
+      is_unbalance: true
+      random_state: 42
+      n_jobs: -1
+      verbose: -1
+    search_space:
+      n_estimators: [100, 300, 500, 800]
+      max_depth: [4, 6, 8, 12]
+      learning_rate: [0.005, 0.01, 0.05, 0.1]
+      num_leaves: [15, 31, 63, 127]
+      min_child_samples: [5, 10, 20, 50]
+
+  catboost:
+    enabled: true
+    class: "catboost.CatBoostClassifier"
+    fixed_params:
+      auto_class_weights: "Balanced"
+      random_seed: 42
+      verbose: 0
+    search_space:
+      iterations: [200, 500, 1000]
+      depth: [4, 6, 8]
+      learning_rate: [0.01, 0.05, 0.1]
+      l2_leaf_reg: [1, 3, 5, 10]
+
+  stacked_ensemble:
+    enabled: true
+    base_estimators: ["random_forest", "xgboost", "lightgbm"]
+    meta_learner: "logistic_regression"
+    use_probabilities: true
+
+# === Class Imbalance Handling ===
+imbalance:
+  strategies:
+    - name: "class_weight"          # default, baked into model
+      enabled: true
+    - name: "smote_tomek"
+      enabled: true
+      sampler: "imblearn.combine.SMOTETomek"
+      params:
+        random_state: 42
+    - name: "adasyn"
+      enabled: false               # alt to smote_tomek
+      sampler: "imblearn.over_sampling.ADASYN"
+      params:
+        random_state: 42
+
+# === Preprocessing ===
+preprocessing:
+  imputation:
+    strategy: "median"
+    add_indicator: true            # binary flag for imputed values
+  scaling:
+    strategy: "standard"           # StandardScaler
+    fit_on_train_only: true        # critical — no leakage
+  vif_threshold: 10.0             # remove features above this VIF
+  vif_iterative: true             # iterative removal, highest first
+
+# === Hyperparameter Tuning ===
+tuning:
+  n_trials: 100
+  framework: "optuna"
+  direction: "maximize"
+  metric: "pr_auc"               # primary metric (imbalanced data)
+  timeout_seconds: 3600          # 1 hour per model
+  n_jobs: 1                      # trials run sequentially (safe)
+  pruner: "MedianPruner"
+
+# === Evaluation Metrics ===
+evaluation:
+  primary: "pr_auc"
+  secondary:
+    - "roc_auc"
+    - "f1"
+    - "precision"
+    - "recall"
+    - "brier_score"
+    - "ece"                       # Expected Calibration Error
+  n_bootstrap: 2000              # resamples for CI
+  confidence_level: 0.95
+  ci_method: "bca"               # Bias-Corrected and Accelerated
+
+# === Calibration ===
+calibration:
+  enabled: true
+  methods: ["sigmoid", "isotonic"]
+  cal_set_fraction: 0.20         # 20% of train for calibration fitting
+
+# === Explainability ===
+explainability:
+  shap:
+    enabled: true
+    n_samples: 500               # background samples for SHAP
+    save_plots: true
+  lime:
+    enabled: true
+    n_features: 10
+    n_samples: 1000
+  global_importance: true
+  local_examples:                # files to explain in detail
+    n_top_risk: 5
+    n_mid_risk: 3
+    n_low_risk: 2
+
+# === Significance Testing ===
+significance:
+  bootstrap_n: 2000
+  alpha: 0.05
+  correction: "bonferroni_holm"  # for multiple comparisons
+  effect_size: "cohens_d"
+  min_paired_obs: 4              # minimum pairs for Wilcoxon
+
+# === MLflow ===
+mlflow:
+  tracking_uri: "mlruns"         # local (use DagsHub URI for remote)
+  experiment_name: "smellpredict_v2"
+  log_artifacts: true
+  log_models: true
+  log_params: true
+  log_metrics: true
+  tags:
+    project: "smellpredict"
+    version: "2.0"

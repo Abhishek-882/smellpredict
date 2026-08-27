@@ -1,0 +1,21 @@
+services:
+  - type: web
+    name: smellpredict
+    env: docker
+    plan: free
+    region: oregon
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /health
+    envVars:
+      - key: SMELLPREDICT_MODEL_PATH
+        value: models/best_model_final.pkl
+      - key: SMELLPREDICT_LOG_LEVEL
+        value: INFO
+      - key: GITHUB_CLIENT_ID
+        sync: false
+      - key: GITHUB_CLIENT_SECRET
+        sync: false
+      - key: GITHUB_REDIRECT_URI
+        sync: false
+      - key: JWT_SECRET_KEY
+        generateValue: true
