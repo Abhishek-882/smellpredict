@@ -15,10 +15,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 WORKDIR /app
 
 # Install Python dependencies
-COPY pyproject.toml .
-COPY requirements-lock.txt .
+COPY requirements.txt .
 RUN pip install --no-cache-dir --upgrade pip \
-    && pip install --no-cache-dir -r requirements-lock.txt
+    && pip install --no-cache-dir -r requirements.txt
 
 # Copy source code and configurations
 COPY src/ src/
