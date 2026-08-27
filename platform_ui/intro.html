@@ -15,6 +15,7 @@
             background: #030712;
             font-family: 'Space Grotesk', sans-serif;
             color: #fff;
+            cursor: pointer;
         }
 
         #c {
@@ -37,8 +38,6 @@
 
         #c-red  { z-index: 2; mix-blend-mode: screen; opacity: 0; }
         #c-blue { z-index: 3; mix-blend-mode: screen; opacity: 0; }
-
-
 
         .vignette {
             position: fixed; inset: 0; z-index: 4;
@@ -67,7 +66,7 @@
             top: 50%;
             left: 0; right: 0;
             height: 1px;
-            background: linear-gradient(90deg, transparent, rgba(79,158,255,0.15) 25%, rgba(79,158,255,0.15) 75%, transparent);
+            background: linear-gradient(90deg, transparent, rgba(245,158,11,0.2) 25%, rgba(245,158,11,0.2) 75%, transparent);
         }
 
         #platform-label {
@@ -77,19 +76,16 @@
             font-size: 11px;
             font-weight: 500;
             letter-spacing: 3px;
-            color: rgba(255,255,255,0);
+            color: rgba(255,255,255,0.6);
             text-transform: uppercase;
-            transition: color 1.5s ease 0.4s;
             display: flex;
             align-items: center;
             gap: 10px;
         }
 
-        #platform-label.show { color: rgba(255,255,255,0.4); }
-
         #platform-label svg {
             width: 16px; height: 16px;
-            color: #4f9eff;
+            color: #f59e0b;
         }
 
         #version-tag {
@@ -99,12 +95,9 @@
             font-size: 11px;
             font-weight: 400;
             letter-spacing: 3px;
-            color: rgba(255,255,255,0);
+            color: rgba(245,158,11,0.7);
             text-transform: uppercase;
-            transition: color 1.5s ease 0.4s;
         }
-
-        #version-tag.show { color: rgba(79,158,255,0.5); }
 
         #enter-prompt {
             position: fixed;
@@ -112,34 +105,36 @@
             left: 50%;
             transform: translateX(-50%);
             z-index: 10;
-            font-size: 11px;
-            font-weight: 500;
-            letter-spacing: 5px;
+            font-size: 11.5px;
+            font-weight: 600;
+            letter-spacing: 4px;
             text-transform: uppercase;
-            color: rgba(255, 255, 255, 0);
+            color: #fff;
             cursor: pointer;
-            transition: color 1.2s ease, transform 0.25s ease, background 0.25s ease;
+            transition: all 0.25s ease;
             white-space: nowrap;
             display: flex;
             align-items: center;
             gap: 12px;
-            padding: 10px 24px;
+            padding: 11px 26px;
             border-radius: 100px;
-            border: 1px solid transparent;
+            border: 1px solid rgba(245,158,11,0.4);
+            background: rgba(245,158,11,0.12);
+            box-shadow: 0 0 24px rgba(245,158,11,0.25);
+            animation: pulseGlow 2s infinite ease-in-out;
         }
 
         #enter-prompt:hover {
             color: #fff !important;
             transform: translateX(-50%) translateY(-2px);
-            background: rgba(79, 158, 255, 0.12);
-            border-color: rgba(79, 158, 255, 0.3);
-            box-shadow: 0 0 30px rgba(79, 158, 255, 0.2);
+            background: rgba(245, 158, 11, 0.25);
+            border-color: #f59e0b;
+            box-shadow: 0 0 35px rgba(245, 158, 11, 0.45);
         }
 
-        #enter-prompt.show {
-            color: rgba(255,255,255,0.6);
-            border-color: rgba(255,255,255,0.08);
-            background: rgba(255,255,255,0.03);
+        @keyframes pulseGlow {
+            0%, 100% { box-shadow: 0 0 15px rgba(245,158,11,0.2); }
+            50% { box-shadow: 0 0 30px rgba(245,158,11,0.45); }
         }
 
         #enter-prompt svg {
@@ -149,8 +144,8 @@
         }
 
         @keyframes arrowBounce {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(3px); }
+            0%, 100% { transform: translateX(0); }
+            50% { transform: translateX(4px); }
         }
 
         .skip-btn {
@@ -158,27 +153,34 @@
             bottom: 32px;
             right: 36px;
             z-index: 10;
-            font-size: 10px;
-            font-weight: 500;
+            font-size: 10.5px;
+            font-weight: 600;
             letter-spacing: 2px;
             text-transform: uppercase;
-            color: rgba(255,255,255,0.3);
+            color: rgba(255,255,255,0.4);
             text-decoration: none;
             transition: color 0.2s;
         }
 
         .skip-btn:hover {
-            color: #4f9eff;
+            color: #f59e0b;
         }
     </style>
 </head>
 <body>
 
+    <!-- Fast session check to avoid replaying on reload/back -->
+    <script>
+    if (sessionStorage.getItem('sp_intro_seen') === 'true' && !window.location.search.includes('replay')) {
+        window.location.replace('index.html');
+    }
+    </script>
+
     <canvas id="c"></canvas>
     <canvas id="c-red"></canvas>
     <canvas id="c-blue"></canvas>
     <div class="vignette"></div>
-    <div id="lines"></div>
+    <div id="lines" class="show"></div>
 
     <div id="platform-label">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -186,16 +188,16 @@
         </svg>
         <span>Empirical Defect Intelligence</span>
     </div>
-    <div id="version-tag">Defect Intelligence Platform v2.0</div>
+    <div id="version-tag">Platform v2.0</div>
 
-    <div id="enter-prompt">
-        <span>Enter Platform</span>
+    <div id="enter-prompt" onclick="enterPlatform(event)">
+        <span>Press Enter / Click to Launch</span>
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
             <path d="M5 12h14M12 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
     </div>
 
-    <a href="index.html" class="skip-btn">Direct Access &rarr;</a>
+    <a href="index.html" class="skip-btn" onclick="enterPlatform(event)">Direct Access &rarr;</a>
 
     <svg id="noise" xmlns="http://www.w3.org/2000/svg">
         <filter id="grain-filter">
@@ -206,6 +208,32 @@
     </svg>
 
     <script>
+    let isEntering = false;
+    function enterPlatform(e) {
+        if (e && e.stopPropagation) e.stopPropagation();
+        if (isEntering) return;
+        isEntering = true;
+        try { sessionStorage.setItem('sp_intro_seen', 'true'); } catch(err){}
+        const ep = document.getElementById('enter-prompt');
+        if (ep) {
+            ep.style.transition = 'opacity 0.2s ease';
+            ep.style.opacity = '0';
+        }
+        document.body.style.transition = 'opacity 0.25s ease';
+        document.body.style.opacity = '0';
+        setTimeout(() => { window.location.replace('index.html'); }, 250);
+    }
+
+    // 1-Click / 1-Keypress instantaneous entry: zero waiting, zero double press needed!
+    window.addEventListener('keydown', e => {
+        if (e.key === 'Enter' || e.key === ' ' || e.key === 'ArrowDown' || e.key === 'Escape') {
+            e.preventDefault();
+            enterPlatform();
+        }
+    });
+
+    document.addEventListener('click', enterPlatform);
+
     (() => {
         'use strict';
 
@@ -215,8 +243,6 @@
         const ctx     = canvas.getContext('2d');
         const ctxR    = cRed.getContext('2d');
         const ctxB    = cBlue.getContext('2d');
-
-
 
         let W = 0, H = 0;
         let mx = 0, my = 0;
@@ -248,226 +274,130 @@
             t2.font = `${fontSize}px 'Bebas Neue', sans-serif`;
             t2.fillText('SmellPredict', W / 2, H / 2);
 
-            const imgData = t2.getImageData(0, 0, W, H);
-            const data = imgData.data;
-            const pts = [];
+            const imgData = t2.getImageData(0, 0, W, H).data;
+            targets = [];
 
-            for (let y = 0; y < H; y += 3) {
-                for (let x = 0; x < W; x += 3) {
+            const step = Math.max(2, Math.floor(Math.sqrt((W * H) / (TOTAL * 3.5))));
+            for (let y = 0; y < H; y += step) {
+                for (let x = 0; x < W; x += step) {
                     const idx = (y * W + x) * 4;
-                    if (data[idx + 3] > 128) {
-                        pts.push({ x, y });
+                    if (imgData[idx + 3] > 120) {
+                        targets.push({ x, y });
                     }
                 }
             }
-
-            for (let i = pts.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [pts[i], pts[j]] = [pts[j], pts[i]];
-            }
-
-            targets = pts;
-        }
-
-        function isSmellHalf(x) {
-            return x < W / 2 - W * 0.01;
         }
 
         function initParticles() {
             particles.length = 0;
-            for (let i = 0; i < TOTAL; i++) {
-                const targetIdx = i % Math.max(targets.length, 1);
-                const tgt = targets[targetIdx] || { x: W/2, y: H/2 };
-                const smell = isSmellHalf(tgt.x);
+            const count = Math.min(TOTAL, targets.length > 0 ? targets.length * 2 : TOTAL);
 
-                let sx, sy;
-                const chaos = Math.random();
-                if (chaos < 0.35) {
-                    sx = tgt.x + (Math.random() - 0.5) * W * 0.6;
-                    sy = -Math.random() * H * 0.5;
-                } else if (chaos < 0.7) {
-                    const angle = Math.random() * Math.PI * 2;
-                    const dist = W * 0.25 + Math.random() * W * 0.35;
-                    sx = W / 2 + Math.cos(angle) * dist;
-                    sy = H / 2 + Math.sin(angle) * dist;
-                } else {
-                    sx = Math.random() * W;
-                    sy = Math.random() * H;
-                }
+            for (let i = 0; i < count; i++) {
+                const angle = Math.random() * Math.PI * 2;
+                const dist  = Math.max(W, H) * (0.6 + Math.random() * 0.8);
+                const ox    = W / 2 + Math.cos(angle) * dist;
+                const oy    = H / 2 + Math.sin(angle) * dist;
+
+                const smell = Math.random() < 0.18;
 
                 particles.push({
-                    x: sx, y: sy,
-                    tx: tgt.x, ty: tgt.y,
-                    vx: 0, vy: 0,
-                    size: Math.random() * 1.8 + 0.4,
-                    delay: Math.random() * 1.6,
-                    speed: 0.045 + Math.random() * 0.04,
-                    smell: smell,
-                    noise: Math.random(),
-                    jitter: (Math.random() - 0.5) * 4,
-                    alpha: 0,
-                    settled: false,
-                    glitchOffset: 0,
-                    hue: smell
-                        ? `hsl(${220 + Math.random() * 45}, 85%, ${60 + Math.random() * 25}%)`
-                        : `hsl(${180 + Math.random() * 35}, 90%, ${55 + Math.random() * 25}%)`,
+                    x: ox, y: oy,
+                    vx: (Math.random() - 0.5) * 40,
+                    vy: (Math.random() - 0.5) * 40,
+                    tx: 0, ty: 0,
+                    ox, oy,
+                    size: Math.random() < 0.08 ? 2.5 : Math.random() < 0.3 ? 1.8 : 1.0,
+                    alpha: Math.random() * 0.6 + 0.2,
+                    baseAlpha: Math.random() * 0.5 + 0.3,
+                    smell,
+                    color: smell ? '#f59e0b' : '#10b981',
+                    arrived: false,
+                    noiseOffset: Math.random() * 1000,
+                    speed: 0.8 + Math.random() * 0.6
                 });
             }
+
+            assignTargets();
         }
 
-        const chaosNoise = [];
-        for (let i = 0; i < 180; i++) {
-            chaosNoise.push({ x: Math.random(), y: Math.random(), s: Math.random() * 1.5 + 0.3 });
+        function assignTargets() {
+            if (targets.length === 0) return;
+            const shuffled = targets.slice().sort(() => Math.random() - 0.5);
+            for (let i = 0; i < particles.length; i++) {
+                const t = shuffled[i % shuffled.length];
+                particles[i].tx = t.x + (Math.random() - 0.5) * 2;
+                particles[i].ty = t.y + (Math.random() - 0.5) * 2;
+            }
         }
 
         function update(dt) {
             time += dt;
             phaseTimer += dt;
 
-            if (phase === 0 && phaseTimer > 0.3) {
-                phase = 1; phaseTimer = 0;
-            }
-            if (phase === 1 && phaseTimer > 3.2) {
-                phase = 2; phaseTimer = 0;
-                document.getElementById('enter-prompt').classList.add('show');
-                document.getElementById('lines').classList.add('show');
-                document.getElementById('version-tag').classList.add('show');
-                document.getElementById('platform-label').classList.add('show');
-                cRed.style.opacity = '0';
-                cBlue.style.opacity = '0';
+            lx += (mx - lx) * 0.05;
+            ly += (my - ly) * 0.05;
+
+            if (phase === 0 && phaseTimer > 0.4) {
+                phase = 1;
+                phaseTimer = 0;
+            } else if (phase === 1 && phaseTimer > 2.0) {
+                phase = 2;
+                phaseTimer = 0;
             }
 
-            if (phase === 1) {
-                aberrationAmt = Math.max(0, 1.0 - phaseTimer / 3.2);
-            } else if (phase === 2) {
-                aberrationAmt = 0;
-            }
-
-            cRed.style.opacity  = (aberrationAmt * 0.55).toFixed(3);
-            cBlue.style.opacity = (aberrationAmt * 0.55).toFixed(3);
+            aberrationAmt = 0;
 
             for (let i = 0; i < particles.length; i++) {
                 const p = particles[i];
-                if (time < p.delay) continue;
 
-                if (phase >= 1) {
+                if (phase === 0) {
+                    p.x += p.vx * dt;
+                    p.y += p.vy * dt;
+                } else if (phase === 1) {
                     const dx = p.tx - p.x;
                     const dy = p.ty - p.y;
                     const dist = Math.sqrt(dx * dx + dy * dy);
-                    const glitchDecay = phase === 1 ? Math.max(0, 1 - phaseTimer / 2.2) : 0;
 
-                    const mdx = p.x - mx;
-                    const mdy = p.y - my;
-                    const md = Math.sqrt(mdx * mdx + mdy * mdy);
-                    if (phase === 2 && md < 120) {
-                        const force = (120 - md) / 120 * 2.8;
-                        p.vx += (mdx / md) * force;
-                        p.vy += (mdy / md) * force;
-                    }
+                    const ease = Math.min(phaseTimer / 1.6, 1.0);
+                    const k = 4.5 * p.speed * ease;
+                    p.vx += dx * k * dt - p.vx * 3.5 * dt;
+                    p.vy += dy * k * dt - p.vy * 3.5 * dt;
 
-                    p.vx += dx * p.speed;
-                    p.vy += dy * p.speed;
+                    p.x += p.vx * dt;
+                    p.y += p.vy * dt;
 
-                    if (glitchDecay > 0) {
-                        p.vx += (Math.random() - 0.5) * p.jitter * glitchDecay * 3;
-                        p.vy += (Math.random() - 0.5) * p.jitter * glitchDecay * 3;
-                    }
-
-                    const damp = phase === 2 ? 0.78 : 0.72;
-                    p.vx *= damp;
-                    p.vy *= damp;
-
-                    p.x += p.vx;
-                    p.y += p.vy;
-                    p.alpha = Math.min(1, p.alpha + 0.04);
-
-                    if (dist < 2) p.settled = true;
-
-                    p.glitchOffset = p.smell && glitchDecay > 0.3
-                        ? Math.sin(time * 18 + i * 0.1) * 3 * glitchDecay
-                        : 0;
+                    if (dist < 4) p.arrived = true;
                 } else {
-                    p.vx += (Math.random() - 0.5) * 0.4;
-                    p.vy += (Math.random() - 0.5) * 0.4;
-                    p.vx *= 0.96;
-                    p.vy *= 0.96;
-                    p.x += p.vx;
-                    p.y += p.vy;
-                    p.alpha = Math.min(0.5, p.alpha + 0.015);
+                    const dx = p.tx - p.x;
+                    const dy = p.ty - p.y;
+                    p.x += dx * 0.12;
+                    p.y += dy * 0.12;
+
+                    const ndx = mx - p.x;
+                    const ndy = my - p.y;
+                    const ndist = Math.sqrt(ndx * ndx + ndy * ndy);
+                    if (ndist < 90) {
+                        const rep = (1 - ndist / 90) * 20;
+                        p.x -= (ndx / ndist) * rep;
+                        p.y -= (ndy / ndist) * rep;
+                    }
                 }
             }
         }
 
         function draw() {
-            ctx.clearRect(0, 0, W, H);
-
-            const bg = ctx.createRadialGradient(W * 0.5, H * 0.5, 0, W * 0.5, H * 0.5, Math.max(W, H) * 0.7);
-            bg.addColorStop(0, '#060a17');
-            bg.addColorStop(1, '#02040a');
-            ctx.fillStyle = bg;
+            ctx.fillStyle = 'rgba(3, 7, 18, 0.35)';
             ctx.fillRect(0, 0, W, H);
 
             for (let i = 0; i < particles.length; i++) {
                 const p = particles[i];
                 if (p.alpha <= 0) continue;
 
-                ctx.globalAlpha = p.alpha * (p.smell && phase === 1
-                    ? 0.7 + 0.3 * Math.sin(time * 12 + i)
-                    : 1.0
-                );
-
-                ctx.fillStyle = p.hue;
-                ctx.fillRect(
-                    p.x + p.glitchOffset - p.size * 0.5,
-                    p.y - p.size * 0.5,
-                    p.size, p.size
-                );
+                ctx.globalAlpha = p.alpha;
+                ctx.fillStyle = p.color;
+                ctx.fillRect(p.x - p.size * 0.5, p.y - p.size * 0.5, p.size, p.size);
             }
-
             ctx.globalAlpha = 1;
-
-            if (phase < 2) {
-                const specAlpha = Math.max(0, 1 - phaseTimer / 2.5);
-                ctx.globalAlpha = specAlpha * 0.3;
-                for (const sp of chaosNoise) {
-                    ctx.fillStyle = '#fff';
-                    ctx.fillRect(
-                        (sp.x * W + Math.sin(time * 3 + sp.y * 10) * 30) % W,
-                        (sp.y * H + Math.cos(time * 2 + sp.x * 10) * 20) % H,
-                        sp.s, sp.s
-                    );
-                }
-                ctx.globalAlpha = 1;
-            }
-        }
-
-        function drawAberration() {
-            if (aberrationAmt < 0.01) return;
-            const shift = aberrationAmt * 8;
-
-            ctxR.clearRect(0, 0, W, H);
-            ctxR.fillStyle = '#000';
-            ctxR.fillRect(0, 0, W, H);
-            for (let i = 0; i < particles.length; i++) {
-                const p = particles[i];
-                if (p.alpha <= 0 || !p.smell) continue;
-                ctxR.globalAlpha = p.alpha * 0.5;
-                ctxR.fillStyle = '#f43f5e';
-                ctxR.fillRect(p.x - shift - p.size * 0.5, p.y - p.size * 0.5, p.size, p.size);
-            }
-            ctxR.globalAlpha = 1;
-
-            ctxB.clearRect(0, 0, W, H);
-            ctxB.fillStyle = '#000';
-            ctxB.fillRect(0, 0, W, H);
-            for (let i = 0; i < particles.length; i++) {
-                const p = particles[i];
-                if (p.alpha <= 0 || p.smell) continue;
-                ctxB.globalAlpha = p.alpha * 0.5;
-                ctxB.fillStyle = '#06b6d4';
-                ctxB.fillRect(p.x + shift - p.size * 0.5, p.y - p.size * 0.5, p.size, p.size);
-            }
-            ctxB.globalAlpha = 1;
         }
 
         let lastT = 0;
@@ -476,8 +406,7 @@
             lastT = ts;
             update(dt);
             draw();
-            drawAberration();
-            requestAnimationFrame(loop);
+            if (!isEntering) requestAnimationFrame(loop);
         }
 
         window.addEventListener('mousemove', e => {
@@ -489,23 +418,6 @@
             mx = e.touches[0].clientX;
             my = e.touches[0].clientY;
         }, { passive: true });
-
-        function enterPlatform() {
-            const ep = document.getElementById('enter-prompt');
-            ep.style.transition = 'opacity 0.35s ease';
-            ep.style.opacity = '0';
-            document.body.style.transition = 'opacity 0.5s ease';
-            document.body.style.opacity = '0';
-            setTimeout(() => { window.location.href = 'index.html'; }, 500);
-        }
-
-        document.getElementById('enter-prompt').addEventListener('click', enterPlatform);
-
-        window.addEventListener('keydown', e => {
-            if (phase >= 2 && (e.key === 'Enter' || e.key === ' ' || e.key === 'ArrowDown')) {
-                enterPlatform();
-            }
-        });
 
         window.addEventListener('resize', () => {
             resize();

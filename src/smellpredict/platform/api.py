@@ -239,8 +239,8 @@ from fastapi.responses import HTMLResponse
 
 @app.get("/", include_in_schema=False)
 async def root():
-    """Redirect to the cinematic SmellPredict intro experience."""
-    return RedirectResponse(url="/ui/intro.html")
+    """Redirect directly to the SmellPredict platform workbench."""
+    return RedirectResponse(url="/ui/index.html")
 
 @app.get("/health", response_model=HealthResponse, tags=["System"])
 async def health_check():
