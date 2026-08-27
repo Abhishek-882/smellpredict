@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>SmellPredict — Defect Intelligence IDE</title>
+  <title>SmellPredict — Defect Intelligence & Team IDE</title>
   
   <!-- Fonts: Space Grotesk (Geometry & Headers), Inter (Ergonomics), JetBrains Mono (Code) -->
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
@@ -59,7 +59,7 @@
       --titlebar-h:     42px;
       --statusbar-h:    26px;
       --rail-w:         46px;
-      --sidebar-w:      270px;
+      --sidebar-w:      280px;
       --panel-w:        350px;
     }
 
@@ -104,7 +104,7 @@
       display: flex;
       align-items: center;
       padding: 0 14px;
-      gap: 12px;
+      gap: 10px;
       flex-shrink: 0;
       z-index: 100;
     }
@@ -153,8 +153,36 @@
       font-family: var(--font-code);
       font-size: 11px;
       color: var(--text-secondary);
+      max-width: 200px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
-    .repo-chip svg { width: 13px; height: 13px; color: var(--amber-core); }
+    .repo-chip svg { width: 13px; height: 13px; color: var(--amber-core); flex-shrink: 0; }
+
+    /* Team Room Badge & Invite */
+    .room-badge-wrap {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      background: #1a1610;
+      border: 1px solid rgba(245, 158, 11, 0.3);
+      border-radius: var(--radius-sm);
+      padding: 3px 8px;
+      font-size: 11px;
+      color: var(--amber-bright);
+    }
+    .room-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green-clean); box-shadow: 0 0 6px var(--green-clean); }
+    .btn-invite-link {
+      background: none;
+      border: none;
+      color: var(--amber-core);
+      font-size: 10.5px;
+      font-weight: 700;
+      text-decoration: underline;
+      padding: 0 2px;
+    }
+    .btn-invite-link:hover { color: #fff; }
 
     .title-spacer { flex: 1; }
 
@@ -177,17 +205,6 @@
       border-color: var(--border-crisp);
     }
     .btn-tool svg { width: 13px; height: 13px; color: var(--amber-core); }
-
-    .btn-primary-tool {
-      background: #262015;
-      border-color: rgba(245, 158, 11, 0.4);
-      color: var(--amber-core);
-    }
-    .btn-primary-tool:hover {
-      background: #332b1c;
-      border-color: var(--amber-core);
-      box-shadow: 0 0 10px var(--amber-glow);
-    }
 
     .btn-signin-trigger {
       display: inline-flex;
@@ -417,6 +434,7 @@
     .tree-tag-clean { background: var(--green-glow); color: var(--green-clean); }
     .tree-tag-warn { background: var(--amber-glow); color: var(--amber-core); }
     .tree-tag-high { background: var(--red-glow); color: var(--red-risk); }
+    .tree-tag-priv { background: rgba(245,158,11,0.15); color: var(--amber-bright); border: 1px solid rgba(245,158,11,0.3); }
 
     /* ── Center Editor Area ── */
     #editor-area {
@@ -704,7 +722,7 @@
       background: var(--bg-surface);
       border: 1px solid var(--border-crisp);
       border-radius: var(--radius-md);
-      width: 440px;
+      width: 460px;
       max-width: 90vw;
       padding: 22px;
       display: flex;
@@ -795,9 +813,17 @@
 
     <div class="title-sep"></div>
 
-    <div class="repo-chip">
+    <div class="repo-chip" id="active-repo-badge">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
       <span id="repo-label">Local Workspace</span>
+    </div>
+
+    <!-- Team Collaboration Room & Live Invite Link -->
+    <div class="room-badge-wrap">
+      <div class="room-dot"></div>
+      <span id="current-room-txt">Room: main</span>
+      <span style="opacity:0.3">|</span>
+      <button class="btn-invite-link" onclick="copyTeamInviteLink()">Invite Team 🔗</button>
     </div>
 
     <div class="title-spacer"></div>
@@ -824,14 +850,17 @@
     
     <!-- 1. Far Left Activity Rail -->
     <nav id="activity-rail">
-      <button class="rail-btn active" title="Explorer (Files & GitHub Repos)" onclick="toggleSidebar('explorer')">
+      <button class="rail-btn active" title="Explorer (Files & Private Repos)" onclick="toggleSidebar('explorer')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
       </button>
       <button class="rail-btn" title="Defect Intelligence Panel" onclick="focusIntelPane('analysis')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
       </button>
-      <button class="rail-btn" title="Team Review Notes" onclick="focusIntelPane('comments')">
+      <button class="rail-btn" title="Team Live Chat" onclick="focusIntelPane('chat')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      </button>
+      <button class="rail-btn" title="Team Line Notes" onclick="focusIntelPane('comments')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/></svg>
       </button>
 
       <div class="rail-spacer"></div>
@@ -854,9 +883,18 @@
 
       <div class="sidebar-scroll">
         
+        <!-- User's Private & Public Repositories (When Connected) -->
+        <div id="user-private-repos-section" style="display:none; flex-direction:column; gap:6px;">
+          <div class="group-label">
+            <span>My Repositories (Private & Public)</span>
+            <span id="user-repo-count-badge" style="font-size:9px;color:var(--amber-core)"></span>
+          </div>
+          <div id="user-repos-list" style="display:flex;flex-direction:column;gap:2px;max-height:220px;overflow-y:auto;"></div>
+        </div>
+
         <!-- Public GitHub Explorer -->
         <div class="repo-search-box">
-          <div class="group-label" style="padding:0">Explore Any GitHub Repo</div>
+          <div class="group-label" style="padding:0">Explore Public GitHub Repo</div>
           <div class="repo-input-row">
             <input type="text" class="repo-input" id="gh-repo-input" placeholder="e.g. pallets/click or URL" onkeydown="if(event.key==='Enter') fetchPublicRepo()"/>
             <button class="btn-fetch" onclick="fetchPublicRepo()">Fetch</button>
@@ -943,7 +981,7 @@
         </button>
         <button class="intel-tab-btn" id="tab-btn-chat" onclick="switchIntelTab('chat')">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-          Team Chat
+          Team Chat (<span id="chat-peer-count">1</span>)
         </button>
         <button class="intel-tab-btn" id="tab-btn-comments" onclick="switchIntelTab('comments')">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/></svg>
@@ -1035,12 +1073,12 @@
         </div>
       </div>
 
-      <!-- Pane: Chat -->
+      <!-- Pane: Team Live Chat -->
       <div class="intel-content-pane" id="pane-chat">
         <div id="chat-messages" style="flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:8px;">
           <div style="background:var(--bg-input);padding:8px 10px;border-radius:4px;border:1px solid var(--border-subtle)">
-            <div style="font-size:10px;color:var(--amber-core);font-weight:700;margin-bottom:3px">SmellPredict Bot</div>
-            <div style="font-size:11.5px;color:var(--text-secondary)">Collaborative room initialized. Messages are synchronized across peers.</div>
+            <div style="font-size:10px;color:var(--amber-core);font-weight:700;margin-bottom:3px">SmellPredict Collaboration Engine</div>
+            <div style="font-size:11.5px;color:var(--text-secondary)">Connected to room: <strong id="chat-room-name" style="color:var(--amber-bright)">main</strong>. Invite teammates via the top-header link!</div>
           </div>
         </div>
         <div style="display:flex;gap:6px;margin-top:auto;">
@@ -1053,9 +1091,13 @@
 
       <!-- Pane: Review Notes -->
       <div class="intel-content-pane" id="pane-comments">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+          <span style="font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase">Line Code Review Notes</span>
+          <button class="btn-tool" style="padding:2px 7px;font-size:10px;" onclick="promptAddComment()">+ Add Note</button>
+        </div>
         <div id="comments-list" style="flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:8px;">
           <div style="font-size:11px;color:var(--text-muted);text-align:center;padding:20px 0;">
-            No line review notes yet.<br/>Click any line margin in Monaco to anchor a note.
+            No review notes attached yet.<br/>Click "+ Add Note" to anchor a note to any line number.
           </div>
         </div>
       </div>
@@ -1073,7 +1115,7 @@
     <div class="title-spacer"></div>
     <div class="status-node" id="sb-lang-node">PYTHON</div>
     <div class="status-node">UTF-8</div>
-    <div class="status-node" id="sb-room-node">Room: main</div>
+    <div class="status-node" id="sb-room-node">👥 1 Peer · Room: main</div>
   </footer>
 </div>
 
@@ -1085,26 +1127,26 @@
       <button class="modal-close" onclick="closeAuthModal()">&times;</button>
     </div>
 
-    <!-- Option 1: 1-Click Guest Developer -->
-    <div class="auth-option-card">
-      <div style="font-weight:700;font-size:13px;color:var(--amber-core)">⚡ 1-Click Guest Developer (Instant)</div>
-      <div style="font-size:11.5px;color:var(--text-secondary)">Start immediately with simulated developer identity, real-time sync, and workspace persistence. No credentials needed.</div>
-      <button class="btn-auth-action" onclick="signInGuest()">Launch Guest Session &rarr;</button>
-    </div>
-
-    <!-- Option 2: GitHub Personal Access Token -->
+    <!-- Option 1: GitHub Personal Access Token (Loads Private & Public Repos) -->
     <div class="auth-option-card">
       <div style="font-weight:700;font-size:13px;color:var(--amber-core)">🔑 GitHub Personal Access Token (PAT)</div>
-      <div style="font-size:11.5px;color:var(--text-secondary)">Paste a GitHub token to browse and analyze your private repositories directly.</div>
+      <div style="font-size:11.5px;color:var(--text-secondary)">Instant access to your <strong>private & public repositories</strong>. Generate a token on <a href="https://github.com/settings/tokens/new?scopes=repo" target="_blank" style="color:var(--amber-bright)">GitHub Token Settings</a> and paste it below:</div>
       <input type="password" id="pat-input" placeholder="ghp_..." style="background:var(--bg-input);border:1px solid var(--border-subtle);padding:6px 8px;border-radius:4px;color:#fff;font-size:11px;outline:none;"/>
-      <button class="btn-auth-action" onclick="signInWithPAT()">Connect Token</button>
+      <button class="btn-auth-action" onclick="signInWithPAT()">Connect & Load Private Repos</button>
+    </div>
+
+    <!-- Option 2: 1-Click Guest Developer -->
+    <div class="auth-option-card">
+      <div style="font-weight:700;font-size:13px;color:var(--amber-core)">⚡ 1-Click Guest Developer (Instant)</div>
+      <div style="font-size:11.5px;color:var(--text-secondary)">Collaborate with teammates immediately with a temporary session identity and workspace persistence.</div>
+      <button class="btn-auth-action" onclick="signInGuest()">Launch Guest Session &rarr;</button>
     </div>
 
     <!-- Option 3: Standard GitHub OAuth -->
     <div class="auth-option-card">
       <div style="font-weight:700;font-size:13px;color:var(--text-primary)">🌐 GitHub OAuth Login</div>
-      <div style="font-size:11.5px;color:var(--text-secondary)">Use standard GitHub OAuth2 authorization flow.</div>
-      <a class="btn-auth-action" href="/auth/github" style="text-decoration:none">Authorize with GitHub</a>
+      <div style="font-size:11.5px;color:var(--text-secondary)">Login via standard GitHub OAuth flow.</div>
+      <a class="btn-auth-action" href="/auth/github" style="text-decoration:none">Authorize via GitHub</a>
     </div>
   </div>
 </div>
@@ -1127,6 +1169,12 @@ let analysisTimer = null;
 let jwt = localStorage.getItem('sp_jwt') || null;
 let currentRepo = null;
 let currentBranch = 'main';
+let currentUser = null;
+
+// Multi-user Team Collaboration Room
+const urlParams = new URLSearchParams(window.location.search);
+let currentRoom = urlParams.get('room') || 'main';
+let collabSocket = null;
 
 const LANG_MAP = {
   py: 'python', java: 'java', js: 'javascript', ts: 'typescript',
@@ -1264,13 +1312,22 @@ public class PaymentOrderProcessor {
 };
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// TOAST & UI HELPERS
+// TOAST, ROOM & COLLABORATION HELPERS
 // ═══════════════════════════════════════════════════════════════════════════════
 function showToast(msg) {
   const el = document.getElementById('toast-msg');
   el.textContent = msg;
   el.classList.add('show');
   setTimeout(() => el.classList.remove('show'), 2500);
+}
+
+function copyTeamInviteLink() {
+  const url = `${window.location.origin}/ui/ide.html?room=${encodeURIComponent(currentRoom)}`;
+  navigator.clipboard.writeText(url).then(() => {
+    showToast(`✓ Team invite link copied: ${url}`);
+  }).catch(() => {
+    prompt('Share this Team Invite Link with your teammates:', url);
+  });
 }
 
 function openAuthModal() {
@@ -1358,8 +1415,110 @@ function loadSample(key) {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// PUBLIC GITHUB REPO EXPLORATION (ZERO AUTH NEEDED)
+// PRIVATE & PUBLIC GITHUB REPO BROWSING
 // ═══════════════════════════════════════════════════════════════════════════════
+async function loadUserRepositories() {
+  if (!jwt) return;
+  try {
+    const res = await fetch('/github/repos', {
+      headers: { 'Authorization': `Bearer ${jwt}` }
+    });
+    if (!res.ok) return;
+    const data = await res.json();
+    const repos = data.repos || [];
+    
+    if (repos.length > 0) {
+      document.getElementById('user-private-repos-section').style.display = 'flex';
+      document.getElementById('user-repo-count-badge').textContent = `${repos.length} repos`;
+
+      const listWrap = document.getElementById('user-repos-list');
+      listWrap.innerHTML = repos.map(r => {
+        const isPriv = r.private;
+        const tagHtml = isPriv ? `<span class="tree-tag tree-tag-priv">Private</span>` : `<span class="tree-tag tree-tag-clean">Public</span>`;
+        return `
+          <div class="tree-item" onclick="loadAuthenticatedRepoTree('${r.full_name}', '${r.default_branch}')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="${isPriv ? '#f59e0b' : '#10b981'}" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+            <span style="overflow:hidden;text-overflow:ellipsis;">${r.name}</span>
+            ${tagHtml}
+          </div>
+        `;
+      }).join('');
+    }
+  } catch (err) {
+    console.warn('Error loading user repos:', err);
+  }
+}
+
+async function loadAuthenticatedRepoTree(fullName, defaultBranch) {
+  showToast(`⚡ Loading ${fullName}...`);
+  try {
+    const [owner, repo] = fullName.split('/');
+    const res = await fetch(`/github/repos/${owner}/${repo}/tree?ref=${defaultBranch}`, {
+      headers: { 'Authorization': `Bearer ${jwt}` }
+    });
+    if (!res.ok) throw new Error('Could not load repository tree');
+    const data = await res.json();
+
+    currentRepo = fullName;
+    currentBranch = defaultBranch;
+
+    document.getElementById('repo-label').textContent = `${fullName}@${defaultBranch}`;
+    document.getElementById('remote-repo-title').textContent = fullName;
+    document.getElementById('remote-file-count').textContent = `${data.tree.length} files`;
+    document.getElementById('remote-files-section').style.display = 'flex';
+
+    const wrap = document.getElementById('remote-tree-list');
+    wrap.innerHTML = data.tree.filter(i => i.type === 'blob').slice(0, 100).map(item => {
+      const ext = item.path.split('.').pop().toLowerCase();
+      const iconColor = ext === 'py' ? '#10b981' : ext === 'java' ? '#f59e0b' : '#a8a29e';
+      return `
+        <div class="tree-item" title="${item.path}" onclick="loadAuthenticatedFile('${owner}', '${repo}', '${item.path}', '${defaultBranch}')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="${iconColor}" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          <span style="overflow:hidden;text-overflow:ellipsis;">${item.path}</span>
+        </div>
+      `;
+    }).join('');
+
+    showToast(`✓ Loaded ${data.tree.length} files from ${fullName}`);
+  } catch (err) {
+    showToast(`❌ ${err.message}`);
+  }
+}
+
+async function loadAuthenticatedFile(owner, repo, path, branch) {
+  showToast(`Loading ${path}...`);
+  try {
+    const res = await fetch(`/github/repos/${owner}/${repo}/file?path=${encodeURIComponent(path)}&ref=${branch}`, {
+      headers: { 'Authorization': `Bearer ${jwt}` }
+    });
+    if (!res.ok) throw new Error('Failed to load private file');
+    const data = await res.json();
+
+    const fname = path.split('/').pop();
+    const ext = fname.split('.').pop().toLowerCase();
+    const lang = LANG_MAP[ext] || 'plaintext';
+
+    currentFilename = fname;
+    currentLanguage = lang;
+    currentContent = data.content;
+
+    document.getElementById('active-tab-name').textContent = fname;
+    document.getElementById('crumb-filename').textContent = `${owner}/${repo}/${path}`;
+    document.getElementById('sb-lang-node').textContent = lang.toUpperCase();
+
+    if (editor) {
+      const model = monaco.editor.createModel(currentContent, lang);
+      const old = editor.getModel();
+      editor.setModel(model);
+      if (old) old.dispose();
+      triggerAnalysis();
+    }
+    showToast(`✓ Loaded ${fname}`);
+  } catch (err) {
+    showToast(`❌ Error: ${err.message}`);
+  }
+}
+
 function setAndFetchRepo(repoName) {
   document.getElementById('gh-repo-input').value = repoName;
   fetchPublicRepo();
@@ -1613,7 +1772,131 @@ function updateAnalysisView(data, latency) {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// FRICTIONLESS AUTH METHODS (1-CLICK GUEST / PAT / OAUTH)
+// MULTI-USER TEAM WEBSOCKET & CHAT
+// ═══════════════════════════════════════════════════════════════════════════════
+function initCollaboration() {
+  document.getElementById('current-room-txt').textContent = `Room: ${currentRoom}`;
+  document.getElementById('chat-room-name').textContent = currentRoom;
+  document.getElementById('sb-room-node').textContent = `👥 Connected · Room: ${currentRoom}`;
+
+  loadRoomChatHistory();
+  loadRoomComments();
+
+  // Connect WebSocket
+  const wsProto = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+  const wsUrl = `${wsProto}//${window.location.host}/ws/room/${encodeURIComponent(currentRoom)}`;
+  try {
+    collabSocket = new WebSocket(wsUrl);
+    collabSocket.onmessage = (event) => {
+      try {
+        const data = JSON.parse(event.data);
+        if (data.type === 'CHAT_MESSAGE') {
+          renderChatBubble(data.message);
+        } else if (data.type === 'NEW_COMMENT') {
+          loadRoomComments();
+        }
+      } catch (e) {}
+    };
+    collabSocket.onopen = () => {
+      showToast(`✓ Joined Team Room: ${currentRoom}`);
+    };
+  } catch (e) {}
+}
+
+async function loadRoomChatHistory() {
+  try {
+    const res = await fetch(`/rooms/${encodeURIComponent(currentRoom)}/chat`);
+    if (!res.ok) return;
+    const data = await res.json();
+    const wrap = document.getElementById('chat-messages');
+    (data.messages || []).forEach(m => renderChatBubble(m));
+  } catch (e) {}
+}
+
+function renderChatBubble(msg) {
+  const wrap = document.getElementById('chat-messages');
+  const bubble = document.createElement('div');
+  bubble.style.cssText = 'background:var(--bg-card);padding:8px 10px;border-radius:4px;border:1px solid var(--border-subtle);';
+  bubble.innerHTML = `
+    <div style="font-size:10px;color:var(--amber-core);font-weight:700;margin-bottom:3px">${msg.author || 'Collaborator'}</div>
+    <div style="font-size:11.5px;color:var(--text-primary);">${msg.text}</div>
+  `;
+  wrap.appendChild(bubble);
+  wrap.scrollTop = wrap.scrollHeight;
+}
+
+async function sendChatMessage() {
+  const inp = document.getElementById('chat-input');
+  const txt = (inp.value || '').trim();
+  if (!txt) return;
+
+  const author = currentUser ? currentUser.username : 'Developer';
+  const avatar = currentUser ? currentUser.avatar_url : '';
+
+  try {
+    await fetch(`/rooms/${encodeURIComponent(currentRoom)}/chat`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ author, avatar, text: txt })
+    });
+    inp.value = '';
+  } catch (e) {
+    showToast('❌ Failed to send message');
+  }
+}
+
+async function loadRoomComments() {
+  try {
+    const res = await fetch(`/rooms/${encodeURIComponent(currentRoom)}/comments`);
+    if (!res.ok) return;
+    const data = await res.json();
+    const comments = data.comments || [];
+    const wrap = document.getElementById('comments-list');
+    
+    if (comments.length === 0) {
+      wrap.innerHTML = `<div style="font-size:11px;color:var(--text-muted);text-align:center;padding:20px 0;">No review notes attached yet.<br/>Click "+ Add Note" to anchor a note to any line number.</div>`;
+      return;
+    }
+
+    wrap.innerHTML = comments.map(c => `
+      <div style="background:var(--bg-input);padding:9px 11px;border-radius:4px;border-left:3px solid var(--amber-core);border:1px solid var(--border-subtle);">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+          <span style="font-size:10.5px;font-weight:700;color:var(--amber-core);">Line ${c.line_number} · ${c.author}</span>
+          <span style="font-size:9.5px;color:var(--text-muted);">${c.resolved ? '✓ Resolved' : 'Open'}</span>
+        </div>
+        <div style="font-size:11.5px;color:var(--text-primary);">${c.text}</div>
+      </div>
+    `).join('');
+  } catch (e) {}
+}
+
+async function promptAddComment() {
+  const lineStr = prompt('Enter line number for code review note:', '1');
+  if (!lineStr) return;
+  const line = parseInt(lineStr, 10);
+  if (isNaN(line)) return showToast('❌ Invalid line number');
+
+  const text = prompt(`Enter review note for line ${line}:`);
+  if (!text) return;
+
+  const author = currentUser ? currentUser.username : 'Developer';
+  const avatar = currentUser ? currentUser.avatar_url : '';
+
+  try {
+    await fetch(`/rooms/${encodeURIComponent(currentRoom)}/comments`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ line_number: line, author, avatar, text })
+    });
+    showToast(`✓ Added review note to line ${line}`);
+    loadRoomComments();
+  } catch (e) {
+    showToast('❌ Error adding review note');
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// AUTH METHODS (1-CLICK GUEST / PAT / OAUTH)
 // ═══════════════════════════════════════════════════════════════════════════════
 async function signInGuest() {
   showToast('⚡ Launching Guest Session...');
@@ -1622,6 +1905,7 @@ async function signInGuest() {
     const data = await res.json();
     jwt = data.token;
     localStorage.setItem('sp_jwt', jwt);
+    currentUser = { username: data.username, avatar_url: data.avatar_url };
     applyUserSession(data.username, data.avatar_url);
     closeAuthModal();
     showToast(`✓ Welcome, ${data.username}!`);
@@ -1635,7 +1919,7 @@ async function signInWithPAT() {
   const token = inp.value.trim();
   if (!token) return showToast('❌ Token is required');
 
-  showToast('🔑 Connecting Token...');
+  showToast('🔑 Connecting & loading private repos...');
   try {
     const res = await fetch('/auth/token', {
       method: 'POST',
@@ -1646,9 +1930,11 @@ async function signInWithPAT() {
     const data = await res.json();
     jwt = data.token;
     localStorage.setItem('sp_jwt', jwt);
+    currentUser = { username: data.username, avatar_url: data.avatar_url };
     applyUserSession(data.username, data.avatar_url);
     closeAuthModal();
-    showToast(`✓ Connected as ${data.username}!`);
+    showToast(`✓ Connected as ${data.username}! Loading private repos...`);
+    loadUserRepositories();
   } catch (e) {
     showToast('❌ Invalid Token');
   }
@@ -1663,8 +1949,7 @@ function applyUserSession(username, avatarUrl) {
 }
 
 async function checkAuth() {
-  const params = new URLSearchParams(window.location.search);
-  const tokenFromUrl = params.get('token');
+  const tokenFromUrl = urlParams.get('token');
   if (tokenFromUrl) {
     jwt = tokenFromUrl;
     localStorage.setItem('sp_jwt', jwt);
@@ -1677,7 +1962,9 @@ async function checkAuth() {
     const res = await fetch('/auth/me', { headers: { 'Authorization': `Bearer ${jwt}` } });
     if (!res.ok) throw new Error('Auth invalid');
     const user = await res.json();
+    currentUser = user;
     applyUserSession(user.username, user.avatar_url);
+    loadUserRepositories();
   } catch (e) {
     localStorage.removeItem('sp_jwt');
   }
@@ -1688,28 +1975,12 @@ function logout() {
   window.location.reload();
 }
 
-function sendChatMessage() {
-  const inp = document.getElementById('chat-input');
-  const txt = (inp.value || '').trim();
-  if (!txt) return;
-
-  const wrap = document.getElementById('chat-messages');
-  const bubble = document.createElement('div');
-  bubble.style.cssText = 'background:var(--bg-card);padding:8px 10px;border-radius:4px;border:1px solid var(--border-subtle);';
-  bubble.innerHTML = `
-    <div style="font-size:10px;color:var(--amber-core);font-weight:700;margin-bottom:3px">You · Just now</div>
-    <div style="font-size:11.5px;color:var(--text-primary);">${txt}</div>
-  `;
-  wrap.appendChild(bubble);
-  wrap.scrollTop = wrap.scrollHeight;
-  inp.value = '';
-}
-
 // ═══════════════════════════════════════════════════════════════════════════════
 // INITIALIZATION
 // ═══════════════════════════════════════════════════════════════════════════════
 window.addEventListener('DOMContentLoaded', () => {
   initMonaco();
+  initCollaboration();
   checkAuth();
 });
 </script>
