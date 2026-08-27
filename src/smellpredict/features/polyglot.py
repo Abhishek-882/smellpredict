@@ -69,12 +69,16 @@ class PolyglotAnalysisResult:
     metrics: PolyglotMetrics
     smells: PolyglotSmells
     refactoring_advice: List[Dict[str, Any]] = field(default_factory=list)
+    is_ml_prediction: bool = False
+    model_name: str = "Static Telemetry (Untrained ML)"
 
     def to_dict(self) -> Dict[str, Any]:
         return {
             "language": self.language,
             "filename": Path(self.file_path).name,
             "file_path": self.file_path,
+            "is_ml_prediction": self.is_ml_prediction,
+            "model_name": self.model_name,
             "risk": {
                 "probability": round(self.risk_probability, 3),
                 "tier": self.risk_tier,
@@ -488,23 +492,28 @@ def detect_polyglot_smells(metrics: PolyglotMetrics) -> Tuple[PolyglotSmells, fl
 def polyglot_analyze(source: str, file_path: str = "untitled.txt") -> PolyglotAnalysisResult:
     """
     Main polyglot analysis function.
-    Detects language from filename extension, extracts metrics, detects smells,
-    and returns a PolyglotAnalysisResult.
+    Extracts static metrics and structural smells.
+    Transparently marks non-Python/non-Java languages as Untrained for ML risk inference.
     """
     ext = Path(file_path).suffix.lower()
     language = EXTENSION_MAP.get(ext, "plaintext")
 
     metrics = extract_polyglot_metrics(source, language)
-    smells, prob, tier, icon, rec, advice = detect_polyglot_smells(metrics)
+    smells, _, _, _, _, advice = detect_polyglot_smells(metrics)
+
+    # Scientific honesty: Do not fake ML bug predictions for untrained languages
+    rec = f"SmellPredict defect ML model is trained on Python & Java repositories. For {language.capitalize()}, static code complexity telemetry is displayed without ML defect inference."
 
     return PolyglotAnalysisResult(
         language=language,
         file_path=file_path,
-        risk_probability=prob,
-        risk_tier=tier,
-        risk_icon=icon,
+        risk_probability=0.0,
+        risk_tier="Untrained",
+        risk_icon="⚪",
         recommendation=rec,
         metrics=metrics,
         smells=smells,
         refactoring_advice=advice,
+        is_ml_prediction=False,
+        model_name=f"{language.capitalize()} Static Telemetry (No ML Model)",
     )

@@ -1713,26 +1713,45 @@ async function triggerAnalysis() {
 }
 
 function updateAnalysisView(data, latency) {
+  const isMl = Boolean(data.is_ml_prediction !== false && data.risk?.tier !== 'Untrained');
   const prob = data.risk?.probability || 0;
   const pct = Math.round(prob * 100);
   const tier = data.risk?.tier || 'Low';
 
   const bar = document.getElementById('phosphor-bar');
-  bar.style.width = pct + '%';
-
   const pctEl = document.getElementById('risk-pct-txt');
-  pctEl.textContent = `${pct}%`;
-  pctEl.style.color = tier === 'High' || tier === 'Critical' ? 'var(--red-risk)' : tier === 'Medium' ? 'var(--amber-core)' : 'var(--green-clean)';
-
   const badge = document.getElementById('risk-tier-badge');
-  badge.textContent = `${tier} Risk`;
-  badge.className = `meter-tier-badge ${tier === 'High' || tier === 'Critical' ? 'chip-high' : tier === 'Medium' ? 'chip-med' : 'chip-clean'}`;
-
   const crumbChip = document.getElementById('crumb-risk-chip');
-  crumbChip.textContent = `${tier} Risk · ${pct}%`;
-  crumbChip.className = `crumb-risk-chip ${tier === 'High' || tier === 'Critical' ? 'chip-high' : tier === 'Medium' ? 'chip-med' : 'chip-clean'}`;
 
-  document.getElementById('risk-caption-txt').textContent = data.risk?.recommendation || 'Standard peer review recommended.';
+  if (!isMl) {
+    // Non-Python / Non-Java: Static metrics only (No ML faking)
+    bar.style.width = '0%';
+    pctEl.textContent = 'N/A';
+    pctEl.style.color = 'var(--text-muted)';
+    
+    badge.textContent = 'Untrained Language (Static Only)';
+    badge.className = 'meter-tier-badge';
+    badge.style.cssText = 'background:rgba(255,255,255,0.06);color:var(--text-secondary);border:1px solid var(--border-subtle);';
+
+    crumbChip.textContent = 'Static Telemetry · No ML Prior';
+    crumbChip.className = 'crumb-risk-chip';
+    crumbChip.style.cssText = 'background:rgba(255,255,255,0.06);color:var(--text-secondary);border:1px solid var(--border-subtle);';
+  } else {
+    // Trained Model (Python & Java)
+    bar.style.width = pct + '%';
+    pctEl.textContent = `${pct}%`;
+    pctEl.style.color = tier === 'High' || tier === 'Critical' ? 'var(--red-risk)' : tier === 'Medium' ? 'var(--amber-core)' : 'var(--green-clean)';
+
+    badge.textContent = `${tier} Defect Risk`;
+    badge.className = `meter-tier-badge ${tier === 'High' || tier === 'Critical' ? 'chip-high' : tier === 'Medium' ? 'chip-med' : 'chip-clean'}`;
+    badge.style.cssText = '';
+
+    crumbChip.textContent = `${tier} Risk · ${pct}%`;
+    crumbChip.className = `crumb-risk-chip ${tier === 'High' || tier === 'Critical' ? 'chip-high' : tier === 'Medium' ? 'chip-med' : 'chip-clean'}`;
+    crumbChip.style.cssText = '';
+  }
+
+  document.getElementById('risk-caption-txt').textContent = data.risk?.recommendation || (isMl ? 'Calibrated defect probability prior.' : 'Static code telemetry extracted without ML defect prediction.');
 
   const metrics = data.metrics || {};
   document.getElementById('m-loc').textContent = metrics.loc || 0;
