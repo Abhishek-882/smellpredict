@@ -1,0 +1,6 @@
+repo,domain,n_rows,n_pos,n_neg,prevalence_pct,engine_b_pr_auc,engine_b_roc_auc,engine_b_brier,engine_b_lift,engine_b_prec20,engine_b_rec20,engine_a_pr_auc,engine_a_roc_auc,engine_a_brier,engine_a_lift,engine_a_prec20,engine_a_rec20
+django,Web ORM,804,628,176,78.11,0.8976,0.7187,0.2518,0.1165,94.38,24.04,0.8867,0.6726,0.2633,0.1056,95.0,24.2
+rich,Terminal UI,424,315,109,74.29,0.9002,0.7527,0.2185,0.1572,96.43,25.71,0.8771,0.7268,0.2425,0.1342,92.86,24.76
+pillow,Imaging C-Ext,165,69,96,41.82,0.6459,0.7117,0.2175,0.2277,63.64,30.43,0.604,0.6932,0.2175,0.1858,69.7,33.33
+fastapi,Async Web API,287,60,227,20.91,0.6273,0.829,0.1467,0.4182,56.14,53.33,0.5758,0.8072,0.1332,0.3667,56.14,53.33
+COMBINED_4_REPO_OOD,Pooled Zero-Shot Pool,1680,1072,608,63.81,0.835,0.758,0.2221,0.1969,89.58,28.08,0.8217,0.7522,0.2313,0.1836,86.9,27.24

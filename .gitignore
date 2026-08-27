@@ -27,9 +27,17 @@ env/
 *.swo
 
 # Data & models
-data/
+data/*
+!data/processed/
+!data/processed/lopo_dual_engine_publication_table.csv
+!data/processed/experiment_results_dual_engine_v12.csv
+!data/processed/lopo_48repo_publication_table.csv
+!data/processed/significance_tests.csv
 models/*
 !models/best_model_final.pkl
+!models/best_model_final_metadata.json
+!models/engine_a_ast_static.pkl
+!models/engine_a_ast_static_metadata.json
 
 # Logs
 *.log

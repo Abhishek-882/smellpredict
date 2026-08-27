@@ -151,6 +151,10 @@ class FileAnalysisResponse(BaseModel):
     risk: RiskTier
     code_metrics: CodeSummary
     smells: SmellSummary
+    engine_used: str = "engine_a_ast_static"
+    engine_desc: str = "Engine A (Pure Static AST)"
+    guardrail_status: str = "normal"
+    confidence_warning: Optional[str] = None
     top_features: list[dict] = Field(default_factory=list)
     refactoring_advice: list[RefactoringAdviceItem] = Field(default_factory=list)
     shap_available: bool = False
@@ -330,7 +334,11 @@ async def analyze_file(
         refactoring_advice=[
             RefactoringAdviceItem(**adv) for adv in res.get("refactoring_advice", [])
         ],
-        shap_available=res["model_loaded"],
+        engine_used=res.get("engine_used", "engine_a_ast_static"),
+        engine_desc=res.get("engine_desc", "Engine A (Pure Static AST)"),
+        guardrail_status=res.get("guardrail_status", "normal"),
+        confidence_warning=res.get("confidence_warning"),
+        shap_available=res.get("model_loaded", False),
     )
 
 
@@ -569,8 +577,6 @@ async def analyze_live(body: LiveAnalysisRequest):
                 elif hasattr(r, "__dict__"):
                     ref_list.append(vars(r))
                 elif isinstance(r, dict):
-                    ref_list.append(r)
-
             return JSONResponse({
                 "language": "java",
                 "language_badge": "☕ Java",
@@ -613,7 +619,7 @@ async def analyze_live(body: LiveAnalysisRequest):
                 status_code=500,
             )
 
-    # Python CatBoost ML model routing
+    # Python Dual-Engine routing (Engine A: Static AST vs Engine B: Telemetry)
     try:
         from smellpredict.models.predictor import analyze_source_code
 
@@ -638,6 +644,10 @@ async def analyze_live(body: LiveAnalysisRequest):
                 "icon":           result.get("risk_icon", "🟢"),
                 "recommendation": result.get("recommendation", ""),
             },
+            "engine_used": result.get("engine_used", "engine_a_ast_static"),
+            "engine_desc": result.get("engine_desc", "Engine A (Pure Static AST)"),
+            "guardrail_status": result.get("guardrail_status", "normal"),
+            "confidence_warning": result.get("confidence_warning"),
             "smells": {
                 "has_long_method":     int(smells.get("has_long_method", 0)),
                 "has_long_param_list": int(smells.get("has_long_param_list", 0)),
@@ -648,6 +658,7 @@ async def analyze_live(body: LiveAnalysisRequest):
             "metrics": result.get("code_metrics", {}),
             "refactoring": ref_list,
             "filename": body.filename,
+            "is_ml_prediction": result.get("model_loaded", False),
         })
     except Exception as exc:
         logger.error(f"Live analysis error for {body.filename}: {exc}")
