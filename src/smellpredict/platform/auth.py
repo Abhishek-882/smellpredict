@@ -178,10 +178,58 @@ async def auth_github_redirect(request: Request):
     redirect_uri = os.environ.get("GITHUB_REDIRECT_URI") or dynamic_redirect
     
     if not client_id:
-        raise HTTPException(
-            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail="GITHUB_CLIENT_ID is not configured. Set it in your .env file.",
-        )
+        callback_url = redirect_uri
+        html_guide = f"""<!DOCTYPE html>
+<html>
+<head>
+    <title>SmellPredict — GitHub OAuth Setup</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <style>
+        body {{ font-family: -apple-system, BlinkMacSystemFont, 'Inter', sans-serif; background: #0d0d0d; color: #f5f5f4; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; padding: 20px; box-sizing: border-box; }}
+        .card {{ background: #141414; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; max-width: 600px; width: 100%; padding: 28px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }}
+        h2 {{ color: #f59e0b; margin-top: 0; font-size: 20px; }}
+        p {{ color: #a8a29e; font-size: 13.5px; line-height: 1.6; }}
+        code {{ background: #1c1c1c; color: #fbbf24; padding: 2px 6px; border-radius: 4px; font-family: monospace; font-size: 12.5px; }}
+        .step {{ margin: 14px 0; padding: 12px; background: #1a1a1a; border-left: 3px solid #f59e0b; border-radius: 4px; font-size: 13px; }}
+        .btn {{ display: inline-block; background: #f59e0b; color: #0d0d0d; font-weight: 700; padding: 9px 16px; border-radius: 6px; text-decoration: none; font-size: 13px; margin-top: 10px; }}
+        .btn:hover {{ background: #fbbf24; }}
+        .btn-back {{ background: #262626; color: #f5f5f4; margin-left: 8px; }}
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h2>⚡ GitHub OAuth Configuration Required</h2>
+        <p>To enable 1-click GitHub login, create a free OAuth App in your GitHub account:</p>
+        
+        <div class="step">
+            <strong>Step 1:</strong> Go to <a href="https://github.com/settings/applications/new" target="_blank" style="color:#f59e0b">github.com/settings/applications/new</a>
+        </div>
+        
+        <div class="step">
+            <strong>Step 2:</strong> Fill in the fields:
+            <ul style="margin: 6px 0 0 18px; padding: 0;">
+                <li><strong>Application name:</strong> <code>SmellPredict IDE</code></li>
+                <li><strong>Homepage URL:</strong> <code>{proto}://{host}</code></li>
+                <li><strong>Authorization callback URL:</strong> <code>{callback_url}</code></li>
+            </ul>
+        </div>
+
+        <div class="step">
+            <strong>Step 3:</strong> In your <strong>Render Dashboard &rarr; Environment</strong>, add:
+            <ul style="margin: 6px 0 0 18px; padding: 0;">
+                <li><code>GITHUB_CLIENT_ID</code> = &lt;Your Client ID&gt;</li>
+                <li><code>GITHUB_CLIENT_SECRET</code> = &lt;Your Client Secret&gt;</li>
+            </ul>
+        </div>
+
+        <a class="btn" href="https://github.com/settings/applications/new" target="_blank">Open GitHub Developer Settings &rarr;</a>
+        <a class="btn btn-back" href="/ui/ide.html">Return to IDE</a>
+    </div>
+</body>
+</html>"""
+        from fastapi.responses import HTMLResponse
+        return HTMLResponse(content=html_guide, status_code=200)
+
     params = (
         f"?client_id={client_id}"
         f"&redirect_uri={redirect_uri}"
