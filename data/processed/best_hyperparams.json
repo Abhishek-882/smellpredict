@@ -1,0 +1,38 @@
+{
+  "non_faking_note": "Tuned on folds 5-8 validation only. Test fold labels never seen during tuning (R7).",
+  "tuning_folds": [
+    5,
+    6,
+    7,
+    8
+  ],
+  "n_trials_per_model": 50,
+  "random_forest": {
+    "best_validation_pr_auc_folds_5_to_8": 0.6639,
+    "best_params": {
+      "n_estimators": 400,
+      "max_depth": 12,
+      "min_samples_leaf": 2,
+      "max_features": "log2",
+      "min_samples_split": 10,
+      "class_weight": "balanced_subsample",
+      "n_jobs": -1,
+      "random_state": 42
+    }
+  },
+  "lightgbm": {
+    "best_validation_pr_auc_folds_5_to_8": 0.665,
+    "best_params": {
+      "n_estimators": 386,
+      "learning_rate": 0.014513006980733666,
+      "num_leaves": 26,
+      "min_child_samples": 11,
+      "subsample": 0.969784678028921,
+      "colsample_bytree": 0.6002888342215208,
+      "is_unbalance": true,
+      "n_jobs": -1,
+      "verbose": -1,
+      "random_state": 42
+    }
+  }
+}

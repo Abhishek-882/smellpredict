@@ -1,0 +1,164 @@
+name: SmellPredict CI/CD
+
+on:
+  push:
+    branches: [main, dev]
+  pull_request:
+    branches: [main]
+  schedule:
+    - cron: '0 2 * * 0'    # Weekly incremental mining on Sunday 2am
+
+env:
+  PYTHON_VERSION: "3.11"
+
+jobs:
+  # ─── Quality Gate ──────────────────────────────────────────────────
+  lint-and-test:
+    name: Lint + Test
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python ${{ env.PYTHON_VERSION }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install .[dev]
+
+      - name: Lint with Ruff
+        run: ruff check src/ tests/
+
+      - name: Type check with mypy
+        run: mypy src/smellpredict/ --ignore-missing-imports
+        continue-on-error: true  # warn but don't fail on mypy
+
+      - name: Run tests with coverage
+        run: |
+          pytest tests/ -v \
+            --cov=src/smellpredict \
+            --cov-report=xml \
+            --cov-report=term-missing \
+            --tb=short
+
+      - name: Upload coverage report
+        uses: codecov/codecov-action@v4
+        with:
+          file: ./coverage.xml
+          flags: unittests
+          fail_ci_if_error: false
+
+  # ─── Integration Test (smoke test of mining) ───────────────────────
+  smoke-test-mining:
+    name: Smoke Test (Mini Mining)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    needs: lint-and-test
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install .
+
+      - name: Smoke test — mine 1 small repository
+        run: |
+          python -c "
+          from smellpredict.mining.miner import mine_repository
+          import tempfile, os
+
+          with tempfile.TemporaryDirectory() as tmp:
+              df = mine_repository(
+                  repo_url='https://github.com/tartley/colorama',
+                  repo_name='colorama',
+                  clone_dir=tmp,
+                  output_parquet=os.path.join(tmp, 'colorama.parquet'),
+                  snapshot_stride=50,
+                  future_window=10,
+              )
+              print(f'Mined {len(df)} rows from colorama')
+              assert len(df) > 0, 'Mining produced no rows!'
+              assert 'future_bug_fix' in df.columns, 'Label column missing!'
+              print('Smoke test PASSED')
+          "
+
+  # ─── Weekly Incremental Mining ─────────────────────────────────────
+  mine-incremental:
+    name: Weekly Incremental Mining
+    runs-on: ubuntu-latest
+    timeout-minutes: 240    # 4 hours max
+    if: github.event_name == 'schedule'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install .
+
+      - name: Run incremental mining
+        run: |
+          python -c "
+          import yaml
+          from smellpredict.mining.miner import mine_all_repositories
+
+          with open('config/mining_config.yaml') as f:
+              config = yaml.safe_load(f)
+
+          df = mine_all_repositories(
+              config=config,
+              clone_base_dir='data/clones',
+              output_dir='data/raw',
+              db_path='data/smellpredict.duckdb',
+          )
+          print(f'Mining complete: {len(df)} total rows')
+          "
+
+      - name: Upload dataset artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: dataset-${{ github.run_id }}
+          path: data/raw/*.parquet
+          retention-days: 30
+
+  # ─── Docker Build ──────────────────────────────────────────────────
+  docker-build:
+    name: Docker Build
+    runs-on: ubuntu-latest
+    needs: lint-and-test
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build Docker image
+        run: docker build -t smellpredict:latest .
+
+      - name: Test Docker container health
+        run: |
+          docker run -d -p 8000:8000 --name sp_test smellpredict:latest
+          sleep 10
+          curl -f http://localhost:8000/health || (docker logs sp_test && exit 1)
+          docker stop sp_test
