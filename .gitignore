@@ -38,6 +38,8 @@ models/*
 !models/best_model_final_metadata.json
 !models/engine_a_ast_static.pkl
 !models/engine_a_ast_static_metadata.json
+!models/engine_b_full_telemetry.pkl
+!models/engine_b_full_telemetry_metadata.json
 
 # Logs
 *.log

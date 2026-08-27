@@ -94,8 +94,10 @@ def get_engine_b_model() -> Tuple[Optional[Any], Optional[Dict[str, Any]]]:
     """Lazy-load Engine B (Full Enterprise Telemetry Model)."""
     if "model_b" not in _MODEL_CACHE:
         paths = [
-            Path(os.environ.get("SMELLPREDICT_MODEL_PATH", "models/best_model_final.pkl")),
+            Path(os.environ.get("SMELLPREDICT_ENGINE_B_PATH", "models/engine_b_full_telemetry.pkl")),
+            Path("models/engine_b_full_telemetry.pkl"),
             Path("models/best_model_final.pkl"),
+            Path(__file__).parent.parent.parent.parent / "models" / "engine_b_full_telemetry.pkl",
             Path(__file__).parent.parent.parent.parent / "models" / "best_model_final.pkl",
         ]
         loaded, meta = None, None
@@ -103,7 +105,9 @@ def get_engine_b_model() -> Tuple[Optional[Any], Optional[Dict[str, Any]]]:
             if p.exists():
                 try:
                     loaded = joblib.load(p)
-                    meta_path = p.with_name("best_model_final_metadata.json")
+                    meta_path = p.with_name(p.stem + "_metadata.json")
+                    if not meta_path.exists():
+                        meta_path = p.with_name("best_model_final_metadata.json")
                     if meta_path.exists():
                         with open(meta_path, "r", encoding="utf-8") as mf:
                             meta = json.load(mf)
