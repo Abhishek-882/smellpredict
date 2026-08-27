@@ -30,8 +30,14 @@ load_dotenv(find_dotenv())
 from fastapi import FastAPI, File, HTTPException, Query, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-from loguru import logger
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field
+
+try:
+    from loguru import logger
+except ImportError:
+    import logging
+    logging.basicConfig(level=logging.INFO, format="%(asctime)s | %(levelname)-8s | %(name)s - %(message)s")
+    logger = logging.getLogger("smellpredict")
 
 # Platform-level imports
 from smellpredict.features.extractor import extract_file_features

@@ -22,9 +22,12 @@ import base64
 from typing import Optional
 
 from fastapi import APIRouter, HTTPException, Query, Request, status
-from fastapi.responses import JSONResponse
 from github import Github, GithubException, UnknownObjectException
-from loguru import logger
+try:
+    from loguru import logger
+except ImportError:
+    import logging
+    logger = logging.getLogger("smellpredict.github_api")
 from pydantic import BaseModel, Field
 
 from smellpredict.platform.auth import _bearer_token, extract_github_token

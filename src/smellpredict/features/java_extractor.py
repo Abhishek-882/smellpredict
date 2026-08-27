@@ -19,7 +19,11 @@ import re
 from dataclasses import dataclass, asdict
 from typing import Optional
 
-from loguru import logger
+try:
+    from loguru import logger
+except ImportError:
+    import logging
+    logger = logging.getLogger("smellpredict.java_extractor")
 
 try:
     import javalang

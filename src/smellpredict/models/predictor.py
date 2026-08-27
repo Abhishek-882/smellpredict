@@ -14,7 +14,11 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 import numpy as np
-from loguru import logger
+try:
+    from loguru import logger
+except ImportError:
+    import logging
+    logger = logging.getLogger("smellpredict.predictor")
 
 from smellpredict.features.extractor import (
     CodeMetrics,

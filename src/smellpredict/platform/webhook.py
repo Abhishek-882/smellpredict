@@ -16,7 +16,11 @@ import json
 import os
 from typing import Any, Dict, Optional
 from fastapi import APIRouter, Header, HTTPException, Request, BackgroundTasks
-from loguru import logger
+try:
+    from loguru import logger
+except ImportError:
+    import logging
+    logger = logging.getLogger("smellpredict.webhook")
 
 from smellpredict.platform.pr_bot import analyze_pr_files, post_github_pr_review
 

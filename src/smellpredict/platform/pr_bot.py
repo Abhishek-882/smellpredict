@@ -11,7 +11,11 @@ import os
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 import httpx
-from loguru import logger
+try:
+    from loguru import logger
+except ImportError:
+    import logging
+    logger = logging.getLogger("smellpredict.pr_bot")
 
 from smellpredict.features.polyglot import polyglot_analyze, EXTENSION_MAP, LANGUAGE_BADGES
 from smellpredict.features.refactor import generate_quick_fix_patch

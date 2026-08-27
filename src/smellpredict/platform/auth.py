@@ -34,9 +34,12 @@ load_dotenv(find_dotenv())
 import httpx
 from cryptography.fernet import Fernet, InvalidToken
 from fastapi import APIRouter, HTTPException, Query, Request, status
-from fastapi.responses import JSONResponse, RedirectResponse
 from jose import JWTError, jwt
-from loguru import logger
+try:
+    from loguru import logger
+except ImportError:
+    import logging
+    logger = logging.getLogger("smellpredict.auth")
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Configuration (from environment)

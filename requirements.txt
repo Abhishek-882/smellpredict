@@ -1,18 +1,40 @@
-# SmellPredict Production Web & ML Runtime Requirements
+# ═══════════════════════════════════════════════════════════════════════════════
+# SmellPredict — Verified Production Dependencies
+# ═══════════════════════════════════════════════════════════════════════════════
+
+# Core Web Framework & ASGI Server
 fastapi>=0.100.0
 uvicorn[standard]>=0.23.0
 pydantic>=2.0.0
-pyyaml>=6.0
-pyjwt>=2.8.0
-requests>=2.31.0
+pydantic-settings>=2.0.0
 python-multipart>=0.0.6
+python-dotenv>=1.0.0
+pyyaml>=6.0
+
+# Logging & Observability
+loguru>=0.7.0
+
+# Authentication & GitHub Integration
+python-jose[cryptography]>=3.3.0
+pyjwt>=2.8.0
+cryptography>=41.0.0
+httpx>=0.24.0
+requests>=2.31.0
+PyGithub>=2.1.1
 websockets>=11.0
+
+# Machine Learning & Causal Defect Modeling Runtime
 lightgbm>=4.0.0
 scikit-learn>=1.3.0
 joblib>=1.3.0
 numpy>=1.24.0
 pandas>=2.0.0
-radon>=6.0.0
 scipy>=1.11.0
-catboost>=1.2
+catboost>=1.2.0
+
+# Static Analysis & AST Feature Extraction
+radon>=6.0.0
+javalang>=0.13.0
 pydriller>=2.5
+GitPython>=3.1.30
+shap>=0.42.0

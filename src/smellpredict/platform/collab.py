@@ -36,8 +36,11 @@ import os
 from typing import Optional
 
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect, Query
-from fastapi.websockets import WebSocketState
-from loguru import logger
+try:
+    from loguru import logger
+except ImportError:
+    import logging
+    logger = logging.getLogger("smellpredict.collab")
 
 from smellpredict.platform.auth import verify_jwt
 
