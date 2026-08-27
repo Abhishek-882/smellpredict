@@ -577,6 +577,9 @@ async def analyze_live(body: LiveAnalysisRequest):
                 elif hasattr(r, "__dict__"):
                     ref_list.append(vars(r))
                 elif isinstance(r, dict):
+                    ref_list.append(r)
+                else:
+                    ref_list.append({"rule_name": str(r), "advice": str(r)})
             return JSONResponse({
                 "language": "java",
                 "language_badge": "☕ Java",
