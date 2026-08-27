@@ -237,11 +237,13 @@ def get_java_model():
 
 from fastapi.responses import HTMLResponse
 
+@app.head("/", include_in_schema=False)
 @app.get("/", include_in_schema=False)
 async def root():
     """Redirect directly to the SmellPredict platform workbench."""
     return RedirectResponse(url="/ui/index.html")
 
+@app.head("/health", include_in_schema=False)
 @app.get("/health", response_model=HealthResponse, tags=["System"])
 async def health_check():
     """Health check endpoint."""
@@ -253,6 +255,13 @@ async def health_check():
         model_loaded=model is not None,
         model_loaded_java=java_model is not None,
     )
+
+@app.get("/favicon.ico", include_in_schema=False)
+@app.head("/favicon.ico", include_in_schema=False)
+async def favicon():
+    from fastapi.responses import Response
+    svg_icon = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#06b6d4"><circle cx="12" cy="12" r="10"/></svg>'
+    return Response(content=svg_icon, media_type="image/svg+xml")
 
 
 @app.post(

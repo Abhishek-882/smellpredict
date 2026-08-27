@@ -9,9 +9,12 @@ from __future__ import annotations
 
 import os
 import pickle
+import warnings
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
 from typing import Any, Dict, List, Optional
+
+warnings.filterwarnings("ignore")
 
 import numpy as np
 try:

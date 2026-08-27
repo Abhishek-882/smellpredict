@@ -285,20 +285,19 @@ async def _broadcast_json(room_id: str, payload: dict, exclude: Optional[WebSock
 async def collab_websocket(
     websocket: WebSocket,
     room_id: str,
-    token: str = Query(..., description="SmellPredict JWT for authentication"),
+    token: Optional[str] = Query(None, description="SmellPredict JWT for authentication (optional for guests)"),
 ):
     """
     Y.js-compatible WebSocket relay supporting both binary CRDT updates
     and JSON control messages (chat, presence, comments).
     """
-    # ── Auth check BEFORE accepting the connection ──────────────────────────
-    try:
-        payload = verify_jwt(token)
-        username = payload.get("sub", "Anonymous")
-    except Exception:
-        # Reject before handshake — WebSocket close code 4001 = auth failure
-        await websocket.close(code=4001, reason="Authentication failed")
-        return
+    username = f"Dev_{str(uuid.uuid4())[:5]}"
+    if token:
+        try:
+            payload = verify_jwt(token)
+            username = payload.get("sub", username)
+        except Exception:
+            pass  # Fallback to guest name instead of hard-failing handshake
 
     # ── Accept and register ─────────────────────────────────────────────────
     await websocket.accept()
