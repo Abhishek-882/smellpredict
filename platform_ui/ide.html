@@ -1169,11 +1169,10 @@
     <!-- Option 3: Standard GitHub OAuth -->
     <div class="auth-option-card">
       <div style="font-weight:700;font-size:13px;color:var(--text-secondary)">Standard GitHub OAuth Flow</div>
-      <div style="font-size:11.5px;color:var(--text-secondary)">Authorize via GitHub OAuth2 redirect flow.</div>
-      <a class="btn-auth-action" href="/auth/github" style="text-decoration:none">
+      <button class="btn-auth-action" onclick="openOAuthPopup(event)">
         <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
-        Authorize via OAuth
-      </a>
+        Authorize via GitHub (Popup / New Tab)
+      </button>
     </div>
   </div>
 </div>
@@ -1941,6 +1940,33 @@ async function signInGuest() {
   }
 }
 
+function openOAuthPopup(e) {
+  if (e) e.preventDefault();
+  const w = 620, h = 760;
+  const left = Math.max(0, (window.screen.width - w) / 2);
+  const top = Math.max(0, (window.screen.height - h) / 2);
+  const popup = window.open('/auth/github', 'smellpredict_oauth', `width=${w},height=${h},top=${top},left=${left},scrollbars=yes,status=no`);
+  if (!popup || popup.closed || typeof popup.closed === 'undefined') {
+    window.open('/auth/github', '_blank');
+  }
+}
+
+// Seamless cross-window message listener from OAuth popup / new tab
+window.addEventListener('message', (event) => {
+  if (event.data && event.data.type === 'SP_AUTH_SUCCESS') {
+    jwt = event.data.token;
+    currentUser = event.data.user;
+    try {
+      localStorage.setItem('sp_jwt', jwt);
+      localStorage.setItem('sp_user', JSON.stringify(currentUser));
+    } catch(e){}
+    applyUserSession(currentUser.username, currentUser.avatar_url);
+    closeAuthModal();
+    showToast(`Authenticated as ${currentUser.username}`);
+    loadUserRepositories();
+  }
+});
+
 async function signInWithPAT() {
   const inp = document.getElementById('pat-input');
   const token = inp.value.trim();
@@ -1959,8 +1985,11 @@ async function signInWithPAT() {
     }
     const data = await res.json();
     jwt = data.token;
-    localStorage.setItem('sp_jwt', jwt);
     currentUser = { username: data.username, avatar_url: data.avatar_url };
+    try {
+      localStorage.setItem('sp_jwt', jwt);
+      localStorage.setItem('sp_user', JSON.stringify(currentUser));
+    } catch(e){}
     applyUserSession(data.username, data.avatar_url);
     closeAuthModal();
     showToast(`Connected as ${data.username}. Loading repositories...`);
@@ -1979,29 +2008,45 @@ function applyUserSession(username, avatarUrl) {
 }
 
 async function checkAuth() {
+  // 1. Immediately restore cached session for 0-latency UI render
+  const cachedUserStr = localStorage.getItem('sp_user');
+  if (cachedUserStr) {
+    try {
+      currentUser = JSON.parse(cachedUserStr);
+      if (currentUser && currentUser.username) {
+        applyUserSession(currentUser.username, currentUser.avatar_url);
+      }
+    } catch(e){}
+  }
+
+  // 2. Check token from URL redirect
   const tokenFromUrl = urlParams.get('token');
   if (tokenFromUrl) {
     jwt = tokenFromUrl;
-    localStorage.setItem('sp_jwt', jwt);
+    try { localStorage.setItem('sp_jwt', jwt); } catch(e){}
     window.history.replaceState({}, document.title, window.location.pathname);
   }
 
   if (!jwt) return;
 
+  // 3. Verify / refresh user session with backend
   try {
     const res = await fetch('/auth/me', { headers: { 'Authorization': `Bearer ${jwt}` } });
     if (!res.ok) throw new Error('Auth invalid');
     const user = await res.json();
     currentUser = user;
+    try { localStorage.setItem('sp_user', JSON.stringify(user)); } catch(e){}
     applyUserSession(user.username, user.avatar_url);
     loadUserRepositories();
   } catch (e) {
     localStorage.removeItem('sp_jwt');
+    localStorage.removeItem('sp_user');
   }
 }
 
 function logout() {
   localStorage.removeItem('sp_jwt');
+  localStorage.removeItem('sp_user');
   window.location.reload();
 }
 

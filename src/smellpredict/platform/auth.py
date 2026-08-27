@@ -313,9 +313,56 @@ async def auth_github_callback(
     # Issue SmellPredict JWT (GitHub token encrypted inside payload)
     jwt_token = issue_jwt(login=login, avatar_url=avatar_url, github_token=github_token)
 
-    redirect_target = f"/ui/ide.html?token={jwt_token}"
-    logger.info(f"Redirecting user {login} to IDE: {redirect_target}")
-    return RedirectResponse(url=redirect_target, status_code=302)
+    html_success = f"""<!DOCTYPE html>
+<html>
+<head>
+    <title>Authenticating...</title>
+    <style>
+        body {{
+            background: #090d16;
+            color: #f8fafc;
+            font-family: -apple-system, BlinkMacSystemFont, 'Inter', sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }}
+        .card {{
+            text-align: center;
+            background: #1e293b;
+            padding: 30px 40px;
+            border-radius: 8px;
+            border: 1px solid rgba(6, 182, 212, 0.3);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }}
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h3 style="color:#38bdf8; margin: 0 0 8px;">Authentication Successful</h3>
+        <p style="color:#94a3b8; font-size: 13px; margin: 0;">Synchronizing developer profile...</p>
+    </div>
+    <script>
+        const token = "{jwt_token}";
+        const user = {{ username: "{login}", avatar_url: "{avatar_url}" }};
+        
+        try {{
+            localStorage.setItem('sp_jwt', token);
+            localStorage.setItem('sp_user', JSON.stringify(user));
+        }} catch(e) {{}}
+
+        if (window.opener && !window.opener.closed) {{
+            window.opener.postMessage({{ type: 'SP_AUTH_SUCCESS', token, user }}, '*');
+            setTimeout(() => window.close(), 400);
+        }} else {{
+            window.location.replace('/ui/ide.html');
+        }}
+    </script>
+</body>
+</html>"""
+    from fastapi.responses import HTMLResponse
+    return HTMLResponse(content=html_success, status_code=200)
 
 
 @router.post("/guest", summary="Issue an instant guest developer session")
