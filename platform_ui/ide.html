@@ -1201,12 +1201,31 @@
 
     <!-- Option 2: 1-Click Guest Developer -->
     <div class="auth-option-card">
-      <div style="font-weight:700;font-size:13px;color:var(--text-primary)">Instant Guest Developer Session</div>
-      <div style="font-size:11.5px;color:var(--text-secondary)">Launch an instant developer session to collaborate in real time with teammates. No credentials required.</div>
-      <button class="btn-auth-action" onclick="signInGuest()">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-        Launch Guest Session
-      </button>
+      <div style="font-weight:700;font-size:13px;color:var(--text-primary);display:flex;align-items:center;justify-content:space-between;">
+        <span>Instant Guest Developer Session</span>
+        <span style="font-size:9.5px;font-weight:700;padding:2px 7px;border-radius:12px;background:rgba(16,185,129,0.15);color:#34d399;border:1px solid rgba(16,185,129,0.3);">No Sign In Required</span>
+      </div>
+      <div style="font-size:11.5px;color:var(--text-secondary);line-height:1.5;">
+        Launch an instant developer session to collaborate in real time.
+        <div style="margin-top:6px;padding:6px 10px;border-radius:6px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);">
+          <div style="font-size:11px;color:var(--text-primary);font-weight:600;margin-bottom:4px;">
+            💡 Quick Suggestion: Explore <code style="color:var(--cyan-bright);background:rgba(6,182,212,0.1);padding:1px 5px;border-radius:3px;">pallets/click</code> in Guest Mode
+          </div>
+          <div style="font-size:10.5px;color:var(--text-muted);">
+            Instantly run defect risk predictions on public open-source repos (e.g. <code>pallets/click</code>, <code>tiangolo/fastapi</code>, <code>psf/requests</code>) without logging in.
+          </div>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:6px;flex-wrap:wrap;">
+        <button class="btn-auth-action" style="flex:1;" onclick="signInGuest()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+          Launch Guest Session
+        </button>
+        <button class="btn-auth-action" style="background:rgba(6,182,212,0.15);border:1px solid rgba(6,182,212,0.35);color:var(--cyan-bright);" onclick="signInGuestAndExplore('pallets/click')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
+          Explore pallets/click
+        </button>
+      </div>
     </div>
 
     <!-- Option 3: Standard GitHub OAuth -->
@@ -2012,6 +2031,14 @@ async function signInGuest() {
   } catch (e) {
     showToast('Guest session failed');
   }
+}
+
+async function signInGuestAndExplore(repo = 'pallets/click') {
+  await signInGuest();
+  setTimeout(() => {
+    setAndFetchRepo(repo);
+    showToast(`Exploring ${repo}...`);
+  }, 350);
 }
 
 function openOAuthPopup(e) {
