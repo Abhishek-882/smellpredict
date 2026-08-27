@@ -24,14 +24,12 @@ RUN pip install --no-cache-dir --upgrade pip \
 COPY src/ src/
 COPY config/ config/
 COPY platform_ui/ platform_ui/
-COPY reports/ reports/
 
-# Copy trained champion models & metadata into the container
+# Copy trained champion models into the container
 COPY models/ models/
-COPY data/processed/ data/processed/
 
 # Create runtime directories
-RUN mkdir -p data/raw data/processed data/labels data/external logs
+RUN mkdir -p data/raw data/processed data/labels data/external logs reports
 
 # Environment variables
 ENV PYTHONPATH=src
