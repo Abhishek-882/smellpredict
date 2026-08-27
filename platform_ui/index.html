@@ -230,6 +230,8 @@ body.intro-active {
 .scanline {
   position: fixed; top: 0; left: 0; right: 0; height: 2px;
   background: linear-gradient(90deg, transparent, rgba(79,158,255,0.4), transparent);
+  animation: scanline 8s linear infinite; pointer-events: none; z-index: 3; opacity: 0.3;
+}
 @keyframes scanline { 0% { transform: translateY(-100%); } 100% { transform: translateY(100vh); } }
 @keyframes pulseDot { 0%, 100% { transform: scale(1); opacity: 1; box-shadow: 0 0 12px #06b6d4; } 50% { transform: scale(1.4); opacity: 0.6; box-shadow: 0 0 22px #38bdf8; } }
 
