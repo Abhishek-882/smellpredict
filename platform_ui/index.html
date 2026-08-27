@@ -654,75 +654,8 @@ footer {
   </div>
 </section>
 
-<!-- ── 48-Repository LOPO Benchmark Matrix ── -->
-<section class="section">
-  <div class="section-label">Empirical Validation Matrix</div>
-  <div class="section-title">48-Repository LOPO Benchmark</div>
-  <p class="section-sub">Zero cross-project data leakage. Leave-One-Project-Out (LOPO) cross-validation evaluating causal quantile normalization against traditional metrics.</p>
-
-  <div style="margin-top:30px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
-    <input type="text" id="repo-search" placeholder="Search repository (e.g. flask, django, requests)..." 
-      style="background:var(--card);border:1px solid var(--brd);border-radius:8px;padding:9px 14px;color:var(--txt);font-size:13px;font-family:'Space Grotesk',sans-serif;width:100%;max-width:380px;outline:none;"
-      oninput="filterRepoTable()"/>
-    <span style="font-size:12px;color:var(--muted);" id="repo-count-label">Showing 48 Repositories</span>
-  </div>
-
-  <div style="margin-top:16px;background:var(--card);border:1px solid var(--brd);border-radius:12px;overflow:hidden;" class="reveal">
-    <div style="max-height:420px;overflow-y:auto;">
-      <table style="width:100%;border-collapse:collapse;text-align:left;font-size:12.5px;font-family:'JetBrains Mono',monospace;" id="bench-table">
-        <thead>
-          <tr style="background:var(--elev);border-bottom:1px solid var(--brd);color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:0.04em;position:sticky;top:0;z-index:2;">
-            <th style="padding:12px 16px;">Repository</th>
-            <th style="padding:12px 16px;">Domain</th>
-            <th style="padding:12px 16px;">Snapshots</th>
-            <th style="padding:12px 16px;">Baseline PR</th>
-            <th style="padding:12px 16px;">SmellPredict PR</th>
-            <th style="padding:12px 16px;text-align:right;">Delta (&Delta;)</th>
-          </tr>
-        </thead>
-        <tbody id="bench-tbody" style="color:var(--txt2);">
-          <!-- Populated by JS -->
-        </tbody>
-      </table>
-    </div>
-  </div>
-</section>
-
-<!-- ── Feature Cards ── -->
-<section class="section">
-  <div class="section-label">System Architecture</div>
-  <div class="section-title">Built for Empirical Rigor</div>
-
-  <div class="feat-grid reveal">
-    <div class="feat-card">
-      <div class="feat-icon">
-        <svg viewBox="0 0 24 24" fill="none" stroke="#4f9eff" stroke-width="1.8"><path d="M3 11l8-8 8 8M5 9v9h4v-5h4v5h4V9"/></svg>
-      </div>
-      <div class="feat-title">Causal Quantile Ranks</div>
-      <div class="feat-body">Within-repo percentile ranking normalizes variance across 48 repositories without temporal leakage or cross-project bias.</div>
-      <span class="feat-tag">Quantile-Rank Normalization</span>
-    </div>
-    <div class="feat-card">
-      <div class="feat-icon">
-        <svg viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M7 12l3 3 7-7"/></svg>
-      </div>
-      <div class="feat-title">Zero-Shot OOD Generalization</div>
-      <div class="feat-body">Evaluated on permanently reserved Django and Rich repositories. Achieved PR-AUC of 0.8971 vs 0.437 baseline.</div>
-      <span class="feat-tag">Track Z · Stress Test</span>
-    </div>
-    <div class="feat-card">
-      <div class="feat-icon">
-        <svg viewBox="0 0 24 24" fill="none" stroke="#818cf8" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
-      </div>
-      <div class="feat-title">Noise Quantification</div>
-      <div class="feat-body">Confident Learning audit over 12,241 out-of-fold predictions measured SZZ noise at 20.72%. Causal ensembles proven inherently resilient.</div>
-      <span class="feat-tag">Track B · Audit</span>
-    </div>
-  </div>
-</section>
-
 <!-- ── IDE CTA ── -->
-<div class="cta-band reveal">
+<div class="cta-band reveal" style="margin-top:60px;">
   <div class="cta-title">Interactive Analysis IDE</div>
   <p class="cta-sub">Open the full collaborative Monaco IDE with real-time smell detection, causal metrics breakdown, and empirical defect risk intelligence.</p>
   <a class="btn-primary" href="/ui/ide.html">
@@ -1211,62 +1144,8 @@ function handleLangChange() {
   else if (lang === 'python') loadPreset('clean');
 }
 
-// 48-Repository LOPO Benchmark Dataset
-const BENCHMARK_REPOS = [
-  { name: 'pallets/flask', domain: 'Web Framework', rows: 842, base: 0.4412, sp: 0.7120, delta: '+0.2708' },
-  { name: 'psf/requests', domain: 'HTTP Client', rows: 620, base: 0.4105, sp: 0.6984, delta: '+0.2879' },
-  { name: 'scikit-learn/scikit-learn', domain: 'Machine Learning', rows: 1420, base: 0.4630, sp: 0.7410, delta: '+0.2780' },
-  { name: 'tiangolo/fastapi', domain: 'Async Web API', rows: 530, base: 0.4210, sp: 0.6890, delta: '+0.2680' },
-  { name: 'tornadoweb/tornado', domain: 'Networking', rows: 780, base: 0.3980, sp: 0.6720, delta: '+0.2740' },
-  { name: 'pytest-dev/pytest', domain: 'Testing Suite', rows: 1100, base: 0.4520, sp: 0.7190, delta: '+0.2670' },
-  { name: 'encode/httpx', domain: 'Async HTTP', rows: 410, base: 0.4050, sp: 0.6680, delta: '+0.2630' },
-  { name: 'ansible/ansible', domain: 'DevOps / Automation', rows: 1850, base: 0.4780, sp: 0.7620, delta: '+0.2840' },
-  { name: 'keras-team/keras', domain: 'Deep Learning', rows: 920, base: 0.4350, sp: 0.7040, delta: '+0.2690' },
-  { name: 'pandas-dev/pandas', domain: 'Data Analysis', rows: 2100, base: 0.4890, sp: 0.7810, delta: '+0.2920' },
-  { name: 'celery/celery', domain: 'Distributed Tasks', rows: 890, base: 0.4280, sp: 0.6950, delta: '+0.2670' },
-  { name: 'pydantic/pydantic', domain: 'Data Validation', rows: 670, base: 0.4190, sp: 0.6840, delta: '+0.2650' },
-  { name: 'aio-libs/aiohttp', domain: 'Async Web/HTTP', rows: 820, base: 0.4310, sp: 0.7010, delta: '+0.2700' },
-  { name: 'matplotlib/matplotlib', domain: 'Scientific Viz', rows: 1650, base: 0.4610, sp: 0.7380, delta: '+0.2770' },
-  { name: 'scipy/scipy', domain: 'Scientific Compute', rows: 1940, base: 0.4720, sp: 0.7560, delta: '+0.2840' },
-  { name: 'sqlalchemy/sqlalchemy', domain: 'ORM / Database', rows: 1780, base: 0.4680, sp: 0.7490, delta: '+0.2810' },
-  { name: 'home-assistant/core', domain: 'IoT / Automation', rows: 2350, base: 0.4950, sp: 0.7930, delta: '+0.2980' },
-  { name: 'scrapy/scrapy', domain: 'Web Scraping', rows: 740, base: 0.4120, sp: 0.6780, delta: '+0.2660' },
-  { name: 'urllib3/urllib3', domain: 'HTTP Library', rows: 580, base: 0.3950, sp: 0.6610, delta: '+0.2660' },
-  { name: 'certifi/python-certifi', domain: 'Security', rows: 310, base: 0.3800, sp: 0.6420, delta: '+0.2620' },
-  { name: 'boto/boto3', domain: 'Cloud SDK', rows: 960, base: 0.4400, sp: 0.7100, delta: '+0.2700' },
-  { name: 'networkx/networkx', domain: 'Graph Algorithms', rows: 830, base: 0.4250, sp: 0.6910, delta: '+0.2660' },
-  { name: 'sympy/sympy', domain: 'Symbolic Math', rows: 1890, base: 0.4760, sp: 0.7580, delta: '+0.2820' },
-  { name: 'numpy/numpy', domain: 'Array Computing', rows: 2240, base: 0.4850, sp: 0.7790, delta: '+0.2940' },
-];
-
-function renderRepoTable(list) {
-  const tbody = document.getElementById('bench-tbody');
-  if (!tbody) return;
-  tbody.innerHTML = list.map(r => `
-    <tr style="border-bottom:1px solid rgba(255,255,255,0.04);transition:background 0.15s ease;" onmouseover="this.style.background='var(--elev)'" onmouseout="this.style.background='transparent'">
-      <td style="padding:10px 16px;color:var(--txt);font-weight:600;display:flex;align-items:center;gap:6px;">
-        <svg viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2" style="width:13px;height:13px;flex-shrink:0;"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
-        <span>${r.name}</span>
-      </td>
-      <td style="padding:10px 16px;color:var(--txt2);">${r.domain}</td>
-      <td style="padding:10px 16px;color:var(--muted);">${r.rows.toLocaleString()}</td>
-      <td style="padding:10px 16px;color:var(--muted);">${r.base.toFixed(4)}</td>
-      <td style="padding:10px 16px;color:var(--accent);font-weight:700;">${r.sp.toFixed(4)}</td>
-      <td style="padding:10px 16px;text-align:right;color:var(--green);font-weight:700;">${r.delta}</td>
-    </tr>
-  `).join('');
-  document.getElementById('repo-count-label').textContent = `Showing ${list.length} of 48 Repositories`;
-}
-
-function filterRepoTable() {
-  const q = (document.getElementById('repo-search').value || '').toLowerCase().trim();
-  const filtered = BENCHMARK_REPOS.filter(r => r.name.toLowerCase().includes(q) || r.domain.toLowerCase().includes(q));
-  renderRepoTable(filtered);
-}
-
-// Initialize default preset & benchmark table
+// Initialize default preset
 window.addEventListener('DOMContentLoaded', () => {
-  renderRepoTable(BENCHMARK_REPOS);
   loadPreset('clean');
 });
 
