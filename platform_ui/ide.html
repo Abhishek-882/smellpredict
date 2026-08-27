@@ -552,9 +552,9 @@
     }
     .intel-tab-btn {
       flex: 1;
-      padding: 8px 10px;
+      padding: 9px 4px;
       text-align: center;
-      font-size: 11.5px;
+      font-size: 11px;
       font-weight: 600;
       color: var(--text-muted);
       border: none;
@@ -564,9 +564,17 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 6px;
+      gap: 5px;
+      white-space: nowrap;
+      cursor: pointer;
+      min-width: 0;
     }
-    .intel-tab-btn svg { width: 13px; height: 13px; }
+    .intel-tab-btn span {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .intel-tab-btn svg { width: 13px; height: 13px; flex-shrink: 0; }
     .intel-tab-btn:hover { color: var(--text-primary); }
     .intel-tab-btn.active {
       color: var(--cyan-bright);
@@ -995,15 +1003,16 @@
       <div class="intel-tabs">
         <button class="intel-tab-btn active" id="tab-btn-analysis" onclick="switchIntelTab('analysis')">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
-          Analysis
+          <span>Analysis</span>
         </button>
         <button class="intel-tab-btn" id="tab-btn-chat" onclick="switchIntelTab('chat')">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-          Team Chat (<span id="chat-peer-count">1</span>)
+          <span>Chat</span>
+          <span id="chat-peer-count" style="background:rgba(6, 182, 212, 0.2);color:var(--cyan-bright);font-size:9.5px;padding:1px 5px;border-radius:10px;font-weight:700">1</span>
         </button>
         <button class="intel-tab-btn" id="tab-btn-comments" onclick="switchIntelTab('comments')">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/></svg>
-          Review Notes
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/></svg>
+          <span>Notes</span>
         </button>
       </div>
 
@@ -1092,18 +1101,40 @@
       </div>
 
       <!-- Pane: Team Live Chat -->
-      <div class="intel-content-pane" id="pane-chat">
-        <div id="chat-messages" style="flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:8px;">
-          <div style="background:var(--bg-input);padding:8px 10px;border-radius:4px;border:1px solid var(--border-subtle)">
-            <div style="font-size:10px;color:var(--cyan-bright);font-weight:700;margin-bottom:3px">SmellPredict Collaboration Engine</div>
-            <div style="font-size:11.5px;color:var(--text-secondary)">Connected to room: <strong id="chat-room-name" style="color:var(--cyan-bright)">main</strong>. Share invite link with teammates to code synchronously.</div>
+      <div class="intel-content-pane" id="pane-chat" style="height:100%; display:flex; flex-direction:column; padding:12px; gap:10px; overflow:hidden;">
+        <!-- Collaboration Info Header Card with 1-Click Invite Copy -->
+        <div style="background:var(--bg-card); padding:10px 12px; border-radius:var(--radius-md); border:1px solid var(--border-subtle); display:flex; flex-direction:column; gap:6px; flex-shrink:0;">
+          <div style="display:flex; align-items:center; justify-content:space-between;">
+            <div style="display:flex; align-items:center; gap:6px;">
+              <span style="display:inline-block; width:7px; height:7px; border-radius:50%; background:var(--green-clean); box-shadow:0 0 6px var(--green-clean);"></span>
+              <span style="font-size:11px; font-weight:700; color:var(--text-primary); text-transform:uppercase; letter-spacing:0.04em;">Team Room: <span id="chat-room-name" style="color:var(--cyan-bright);">main</span></span>
+            </div>
+            <button class="btn-tool" style="padding:3px 8px; font-size:10px; display:flex; align-items:center; gap:4px;" onclick="copyInviteLink()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:11px;height:11px;"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+              <span>Invite</span>
+            </button>
+          </div>
+          <div style="font-size:11px; color:var(--text-secondary); line-height:1.4;">
+            Real-time workspace relay. Share your invite link to collaborate with teammates synchronously.
           </div>
         </div>
-        <div style="display:flex;gap:6px;margin-top:auto;">
-          <input type="text" id="chat-input" placeholder="Type team message..." 
-            style="flex:1;background:var(--bg-input);border:1px solid var(--border-subtle);border-radius:4px;padding:6px 9px;color:var(--text-primary);font-size:11.5px;outline:none;"
+
+        <!-- Scrollable Messages Container -->
+        <div id="chat-messages" style="flex:1; overflow-y:auto; display:flex; flex-direction:column; gap:8px; padding-right:2px;">
+          <div class="empty-chat-placeholder" style="font-size:11px; color:var(--text-muted); text-align:center; padding:30px 10px; margin:auto 0;">
+            No messages yet in this room.<br/>Send a message below to start collaborating.
+          </div>
+        </div>
+
+        <!-- Integrated Pinned Composer Dock -->
+        <div style="display:flex; align-items:center; gap:6px; background:var(--bg-card); border:1px solid var(--border-crisp); border-radius:var(--radius-md); padding:4px 6px; flex-shrink:0; box-shadow:0 4px 12px rgba(0,0,0,0.3);">
+          <input type="text" id="chat-input" placeholder="Type team message... (Press Enter)" 
+            style="flex:1; background:transparent; border:none; padding:7px 10px; color:var(--text-primary); font-size:12px; outline:none; font-family:var(--font-sans);"
             onkeydown="if(event.key==='Enter') sendChatMessage()"/>
-          <button class="btn-tool" onclick="sendChatMessage()">Send</button>
+          <button class="btn-auth-action" style="padding:6px 12px; font-size:11px; border-radius:var(--radius-sm); height:auto;" onclick="sendChatMessage()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:13px;height:13px;"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+            <span>Send</span>
+          </button>
         </div>
       </div>
 
@@ -1860,11 +1891,20 @@ async function loadRoomChatHistory() {
 
 function renderChatBubble(msg) {
   const wrap = document.getElementById('chat-messages');
+  const emptyPlaceholder = wrap.querySelector('.empty-chat-placeholder');
+  if (emptyPlaceholder) emptyPlaceholder.remove();
+
+  const isMe = currentUser && (msg.author === currentUser.username);
   const bubble = document.createElement('div');
-  bubble.style.cssText = 'background:var(--bg-card);padding:8px 10px;border-radius:4px;border:1px solid var(--border-subtle);';
+  bubble.style.cssText = `background:${isMe ? '#1e293b' : 'var(--bg-card)'}; padding:8px 10px; border-radius:var(--radius-sm); border:1px solid ${isMe ? 'rgba(6, 182, 212, 0.4)' : 'var(--border-subtle)'}; display:flex; flex-direction:column; gap:2px;`;
+  
+  const safeText = (msg.text || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
   bubble.innerHTML = `
-    <div style="font-size:10px;color:var(--cyan-bright);font-weight:700;margin-bottom:3px">${msg.author || 'Collaborator'}</div>
-    <div style="font-size:11.5px;color:var(--text-primary);">${msg.text}</div>
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+      <span style="font-size:10.5px; color:${isMe ? 'var(--cyan-bright)' : 'var(--indigo-structure)'}; font-weight:700;">${msg.author || 'Collaborator'}</span>
+      <span style="font-size:9px; color:var(--text-muted);">${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
+    </div>
+    <div style="font-size:11.5px; color:var(--text-primary); line-height:1.4; word-break:break-word;">${safeText}</div>
   `;
   wrap.appendChild(bubble);
   wrap.scrollTop = wrap.scrollHeight;
