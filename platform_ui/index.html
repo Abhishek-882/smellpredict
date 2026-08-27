@@ -237,230 +237,181 @@ body.intro-active {
 
 /* ── Nav ── */
 nav {
-  position: fixed; top: 0; left: 0; right: 0; z-index: 100; height: 64px;
-  background: rgba(5, 8, 16, 0.8); backdrop-filter: blur(20px) saturate(180%);
-  border-bottom: 1px solid var(--brd); display: flex; align-items: center; padding: 0 40px; gap: 20px;
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100; height: 52px;
+  background: rgba(5, 8, 16, 0.85); backdrop-filter: blur(20px) saturate(180%);
+  border-bottom: 1px solid var(--brd); display: flex; align-items: center; padding: 0 28px; gap: 16px;
 }
-.nav-logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
-.nav-logo-mark { width: 32px; height: 32px; }
-.nav-brand { font-size: 15px; font-weight: 800; color: var(--txt); letter-spacing: -0.02em; }
+.nav-logo { display: flex; align-items: center; gap: 8px; text-decoration: none; }
+.nav-logo-mark { width: 26px; height: 26px; }
+.nav-brand { font-size: 14px; font-weight: 800; color: var(--txt); letter-spacing: -0.02em; }
 .nav-brand span { color: var(--accent); }
-.nav-divider { width: 1px; height: 20px; background: var(--brd); }
+.nav-divider { width: 1px; height: 16px; background: var(--brd); }
 .nav-pill {
-  font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
-  padding: 3px 10px; border-radius: 20px; border: 1px solid rgba(79,158,255,0.3);
+  font-size: 9.5px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
+  padding: 2px 8px; border-radius: 20px; border: 1px solid rgba(79,158,255,0.3);
   color: var(--accent); background: rgba(79,158,255,0.08);
 }
 .flex1 { flex: 1; }
-.nav-links { display: flex; align-items: center; gap: 6px; }
+.nav-links { display: flex; align-items: center; gap: 4px; }
 .nav-link {
-  color: var(--txt2); text-decoration: none; font-size: 13px; font-weight: 500;
-  padding: 6px 12px; border-radius: 6px; transition: all 0.2s; cursor: pointer;
-  display: inline-flex; align-items: center; gap: 6px;
+  color: var(--txt2); text-decoration: none; font-size: 12px; font-weight: 500;
+  padding: 5px 10px; border-radius: 6px; transition: all 0.2s; cursor: pointer;
+  display: inline-flex; align-items: center; gap: 5px;
 }
 .nav-link:hover { color: var(--txt); background: rgba(255, 255, 255, 0.04); }
-.nav-link svg { width: 14px; height: 14px; }
+.nav-link svg { width: 13px; height: 13px; }
 .nav-cta {
   background: linear-gradient(135deg, var(--accent), var(--accent2));
-  color: #fff; font-weight: 700; font-size: 12px; padding: 8px 18px; border-radius: 8px;
+  color: #fff; font-weight: 700; font-size: 11.5px; padding: 6px 14px; border-radius: 6px;
   text-decoration: none; transition: all 0.25s; letter-spacing: -0.01em;
-  box-shadow: 0 0 24px rgba(79,158,255,0.25); display: inline-flex; align-items: center; gap: 6px;
+  box-shadow: 0 0 20px rgba(79,158,255,0.25); display: inline-flex; align-items: center; gap: 5px;
 }
-.nav-cta:hover { transform: translateY(-1px); box-shadow: 0 4px 32px rgba(79,158,255,0.4); }
+.nav-cta:hover { transform: translateY(-1px); box-shadow: 0 4px 24px rgba(79,158,255,0.4); }
 
 /* ── Hero ── */
 .hero {
-  min-height: 100vh; display: flex; flex-direction: column; align-items: center;
-  justify-content: center; padding: 120px 24px 80px; text-align: center; position: relative;
+  display: flex; flex-direction: column; align-items: center;
+  justify-content: center; padding: 88px 20px 32px; text-align: center; position: relative;
 }
 .hero-eyebrow {
-  display: inline-flex; align-items: center; gap: 8px;
+  display: inline-flex; align-items: center; gap: 6px;
   background: rgba(79,158,255,0.08); border: 1px solid rgba(79,158,255,0.2);
-  border-radius: 100px; padding: 6px 16px; margin-bottom: 32px; font-size: 12px;
-  font-weight: 600; color: var(--accent); letter-spacing: 0.04em;
+  border-radius: 100px; padding: 4px 12px; margin-bottom: 20px; font-size: 11px;
+  font-weight: 600; color: var(--accent); letter-spacing: 0.03em;
 }
 .hero-eyebrow-dot {
-  width: 6px; height: 6px; border-radius: 50%; background: var(--accent);
+  width: 5px; height: 5px; border-radius: 50%; background: var(--accent);
   animation: pulse-dot 2s ease-in-out infinite;
 }
 @keyframes pulse-dot { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(0.8); } }
 .hero h1 {
-  font-size: clamp(38px, 7vw, 76px); font-weight: 900; letter-spacing: -0.04em;
-  line-height: 1.06; margin-bottom: 24px; max-width: 920px;
+  font-size: clamp(28px, 4.2vw, 44px); font-weight: 800; letter-spacing: -0.03em;
+  line-height: 1.15; margin-bottom: 12px; max-width: 760px;
 }
 .hero h1 .grad {
   background: linear-gradient(135deg, #fff 0%, var(--accent) 50%, var(--accent2) 100%);
   -webkit-background-clip: text; -webkit-text-fill-color: transparent;
 }
 .hero-sub {
-  font-size: clamp(15px, 2vw, 17px); color: var(--txt2); max-width: 640px;
-  line-height: 1.7; margin-bottom: 44px; font-weight: 400;
+  font-size: 14px; color: var(--txt2); max-width: 560px;
+  line-height: 1.6; margin-bottom: 24px; font-weight: 400;
 }
-.hero-actions { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; margin-bottom: 70px; }
+.hero-actions { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-bottom: 28px; }
 .btn-primary {
   background: linear-gradient(135deg, var(--accent), var(--accent2));
-  color: #fff; font-weight: 700; font-size: 13.5px; padding: 13px 26px; border-radius: 10px;
-  text-decoration: none; transition: all 0.25s; box-shadow: 0 0 40px rgba(79,158,255,0.3);
-  border: none; cursor: pointer; display: inline-flex; align-items: center; gap: 8px;
+  color: #fff; font-weight: 700; font-size: 12.5px; padding: 9px 18px; border-radius: 6px;
+  text-decoration: none; transition: all 0.25s; box-shadow: 0 0 24px rgba(79,158,255,0.25);
+  border: none; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;
 }
-.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 48px rgba(79,158,255,0.45); }
+.btn-primary:hover { transform: translateY(-1px); box-shadow: 0 4px 30px rgba(79,158,255,0.4); }
 .btn-ghost {
-  background: transparent; color: var(--txt); font-weight: 600; font-size: 13.5px;
-  padding: 12px 24px; border-radius: 10px; text-decoration: none; transition: all 0.2s;
-  border: 1px solid var(--brd2); display: inline-flex; align-items: center; gap: 8px;
+  background: transparent; color: var(--txt); font-weight: 600; font-size: 12.5px;
+  padding: 8px 16px; border-radius: 6px; text-decoration: none; transition: all 0.2s;
+  border: 1px solid var(--brd2); display: inline-flex; align-items: center; gap: 6px;
 }
 .btn-ghost:hover { background: rgba(79,158,255,0.06); border-color: rgba(79,158,255,0.5); }
 
-/* ── Score Rings ── */
-.hero-visual { position: relative; margin-bottom: 70px; }
-.score-ring-wrap { display: flex; align-items: center; justify-content: center; gap: 48px; flex-wrap: wrap; }
-.score-ring { position: relative; width: 150px; height: 150px; flex-shrink: 0; }
-.score-ring svg { width: 150px; height: 150px; transform: rotate(-90deg); }
-.score-ring-inner {
-  position: absolute; inset: 0; display: flex; flex-direction: column;
-  align-items: center; justify-content: center;
-}
-.score-val { font-size: 26px; font-weight: 900; color: var(--txt); letter-spacing: -0.03em; }
-.score-lbl { font-size: 10px; font-weight: 700; color: var(--txt2); letter-spacing: 0.06em; text-transform: uppercase; margin-top: 2px; }
-.score-track { fill: none; stroke: rgba(255, 255, 255, 0.05); stroke-width: 8; }
-.score-fill {
-  fill: none; stroke-width: 8; stroke-linecap: round;
-  stroke-dasharray: 408; stroke-dashoffset: 408; transition: stroke-dashoffset 2s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-/* ── Stats Strip ── */
-.stats-strip {
-  display: flex; gap: 0; border: 1px solid var(--brd); border-radius: 16px;
-  overflow: hidden; max-width: 900px; width: 100%; background: var(--card);
-}
-.stat-item {
-  flex: 1; padding: 22px 18px; text-align: center; border-right: 1px solid var(--brd);
-  position: relative; overflow: hidden; transition: background 0.2s;
-}
-.stat-item:last-child { border-right: none; }
-.stat-item:hover { background: rgba(79,158,255,0.04); }
-.stat-item::after {
-  content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
-  width: 0; height: 2px; background: linear-gradient(90deg, var(--accent), var(--accent2));
-  transition: width 0.3s;
-}
-.stat-item:hover::after { width: 60%; }
-.stat-num { font-size: 28px; font-weight: 900; letter-spacing: -0.03em; line-height: 1; }
-.stat-desc { font-size: 11px; color: var(--muted); margin-top: 6px; font-weight: 500; }
-
 /* ── Sections ── */
-.section { padding: 90px 24px; max-width: 1200px; margin: 0 auto; }
+.section { padding: 44px 20px; max-width: 1060px; margin: 0 auto; }
 .section-label {
-  font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
-  color: var(--accent); margin-bottom: 10px;
+  font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--accent); margin-bottom: 6px;
 }
-.section-title { font-size: clamp(26px, 4vw, 40px); font-weight: 800; letter-spacing: -0.03em; line-height: 1.15; margin-bottom: 14px; }
-.section-sub { font-size: 15px; color: var(--txt2); max-width: 580px; line-height: 1.7; }
+.section-title { font-size: clamp(20px, 2.6vw, 28px); font-weight: 800; letter-spacing: -0.025em; line-height: 1.18; margin-bottom: 8px; }
+.section-sub { font-size: 13.5px; color: var(--txt2); max-width: 540px; line-height: 1.55; }
 
 /* ── Live Scanner ── */
 .scanner-wrap {
-  margin-top: 50px; border: 1px solid var(--brd); border-radius: 20px;
+  margin-top: 24px; border: 1px solid var(--brd); border-radius: 12px;
   overflow: hidden; background: var(--card);
 }
 .scanner-header {
-  padding: 14px 22px; border-bottom: 1px solid var(--brd);
-  display: flex; align-items: center; gap: 12px; background: var(--elev);
+  padding: 9px 16px; border-bottom: 1px solid var(--brd);
+  display: flex; align-items: center; gap: 10px; background: var(--elev);
 }
-.scanner-dots { display: flex; gap: 6px; }
-.scanner-dot { width: 10px; height: 10px; border-radius: 50%; }
-.scanner-title { font-size: 12.5px; font-weight: 600; color: var(--txt2); margin-left: 4px; }
+.scanner-dots { display: flex; gap: 5px; }
+.scanner-dot { width: 9px; height: 9px; border-radius: 50%; }
+.scanner-title { font-size: 11.5px; font-weight: 600; color: var(--txt2); margin-left: 2px; }
 .scanner-lang {
   margin-left: auto; font-family: 'JetBrains Mono', monospace; font-size: 11px;
   background: var(--elev); color: var(--txt); border: 1px solid var(--brd);
-  border-radius: 6px; padding: 5px 10px; cursor: pointer; outline: none;
+  border-radius: 4px; padding: 4px 8px; cursor: pointer; outline: none;
 }
-.scanner-body { display: grid; grid-template-columns: 1fr 340px; min-height: 330px; }
+.scanner-body { display: grid; grid-template-columns: 1fr 280px; min-height: 250px; }
 .scanner-editor { border-right: 1px solid var(--brd); position: relative; }
 .code-area {
-  width: 100%; height: 100%; min-height: 330px; background: transparent;
-  border: none; outline: none; padding: 22px; color: var(--txt);
-  font-family: 'JetBrains Mono', monospace; font-size: 13px; line-height: 1.8;
+  width: 100%; height: 100%; min-height: 250px; background: transparent;
+  border: none; outline: none; padding: 14px; color: var(--txt);
+  font-family: 'JetBrains Mono', monospace; font-size: 12px; line-height: 1.65;
   resize: none; caret-color: var(--accent);
 }
 .code-area::placeholder { color: var(--muted); }
-.scanner-panel { padding: 22px; display: flex; flex-direction: column; gap: 14px; }
+.scanner-panel { padding: 14px; display: flex; flex-direction: column; gap: 10px; }
 .scan-trigger {
   width: 100%; background: linear-gradient(135deg, var(--accent), var(--accent2));
-  color: #fff; font-weight: 700; font-size: 13px; padding: 11px 20px; border-radius: 8px;
+  color: #fff; font-weight: 700; font-size: 12px; padding: 9px 16px; border-radius: 6px;
   border: none; cursor: pointer; transition: all 0.25s; display: flex; align-items: center;
-  justify-content: center; gap: 8px;
+  justify-content: center; gap: 6px;
 }
-.scan-trigger:hover { transform: translateY(-1px); box-shadow: 0 4px 24px rgba(79,158,255,0.4); }
+.scan-trigger:hover { transform: translateY(-1px); box-shadow: 0 4px 20px rgba(79,158,255,0.35); }
 .scan-trigger:disabled { opacity: 0.4; cursor: default; transform: none; }
 
-.risk-meter { background: var(--elev); border: 1px solid var(--brd); border-radius: 10px; padding: 16px; }
-.risk-label { font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
-.risk-gauge { position: relative; height: 7px; background: rgba(255,255,255,0.06); border-radius: 8px; overflow: hidden; margin-bottom: 8px; }
+.risk-meter { background: var(--elev); border: 1px solid var(--brd); border-radius: 8px; padding: 12px; }
+.risk-label { font-size: 9.5px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
+.risk-gauge { position: relative; height: 6px; background: rgba(255,255,255,0.06); border-radius: 6px; overflow: hidden; margin-bottom: 6px; }
 .risk-fill {
-  position: absolute; left: 0; top: 0; height: 100%; border-radius: 8px;
+  position: absolute; left: 0; top: 0; height: 100%; border-radius: 6px;
   background: linear-gradient(90deg, var(--green), var(--amber), var(--red));
   width: 0; transition: width 1.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
-.risk-score { font-size: 34px; font-weight: 900; letter-spacing: -0.04em; line-height: 1; }
-.risk-tier { font-size: 12px; font-weight: 600; margin-top: 4px; }
+.risk-score { font-size: 24px; font-weight: 800; letter-spacing: -0.03em; line-height: 1; }
+.risk-tier { font-size: 11px; font-weight: 600; margin-top: 3px; }
 
-.smell-list { display: flex; flex-direction: column; gap: 6px; }
+.smell-list { display: flex; flex-direction: column; gap: 5px; }
 .smell-row {
   display: flex; align-items: center; justify-content: space-between;
-  font-size: 11.5px; padding: 7px 11px; border-radius: 6px; background: var(--elev);
+  font-size: 11px; padding: 5px 9px; border-radius: 4px; background: var(--elev);
   border: 1px solid var(--brd);
 }
 .smell-name { color: var(--txt2); font-weight: 500; }
-.smell-badge { font-size: 9.5px; font-weight: 700; padding: 2px 7px; border-radius: 20px; }
+.smell-badge { font-size: 9px; font-weight: 700; padding: 1px 6px; border-radius: 12px; }
 .smell-clean { background: rgba(16,185,129,0.12); color: var(--green); border: 1px solid rgba(16,185,129,0.2); }
 .smell-warn { background: rgba(245,158,11,0.12); color: var(--amber); border: 1px solid rgba(245,158,11,0.2); }
 
-/* ── Feature Cards ── */
-.feat-grid {
-  display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 1px; border: 1px solid var(--brd); border-radius: 20px; overflow: hidden;
-  background: var(--brd); margin-top: 50px;
+/* Preset pill */
+.preset-pill {
+  font-size: 11px; font-weight: 500; padding: 4px 10px; border-radius: 4px;
+  border: 1px solid var(--brd); background: var(--elev); color: var(--txt2);
+  cursor: pointer; transition: all 0.15s ease;
 }
-.feat-card { background: var(--card); padding: 30px; transition: background 0.2s; position: relative; overflow: hidden; }
-.feat-card:hover { background: var(--elev); }
-.feat-icon {
-  width: 42px; height: 42px; margin-bottom: 18px; border-radius: 8px;
-  background: rgba(79,158,255,0.08); border: 1px solid rgba(79,158,255,0.15);
-  display: flex; align-items: center; justify-content: center;
-}
-.feat-icon svg { width: 20px; height: 20px; }
-.feat-title { font-size: 15px; font-weight: 700; margin-bottom: 8px; }
-.feat-body { font-size: 12.5px; color: var(--txt2); line-height: 1.7; }
-.feat-tag {
-  display: inline-block; margin-top: 14px; font-size: 10px; font-weight: 600;
-  padding: 3px 9px; border-radius: 20px; background: rgba(79,158,255,0.08);
-  border: 1px solid rgba(79,158,255,0.2); color: var(--accent);
+.preset-pill:hover, .preset-pill.active {
+  background: rgba(6, 182, 212, 0.15); color: #38bdf8; border-color: rgba(6, 182, 212, 0.4);
 }
 
 /* ── IDE CTA ── */
 .cta-band {
-  margin: 0 24px 90px; max-width: 1152px; margin-left: auto; margin-right: auto;
-  border: 1px solid var(--brd); border-radius: 24px; background: var(--card);
-  padding: 70px 50px; text-align: center; position: relative; overflow: hidden;
+  margin: 20px auto 44px; max-width: 1060px;
+  border: 1px solid var(--brd); border-radius: 14px; background: var(--card);
+  padding: 36px 24px; text-align: center; position: relative; overflow: hidden;
 }
-.cta-title { font-size: clamp(26px, 4vw, 40px); font-weight: 900; letter-spacing: -0.03em; margin-bottom: 14px; }
-.cta-sub { font-size: 15px; color: var(--txt2); max-width: 500px; margin: 0 auto 36px; line-height: 1.7; }
+.cta-title { font-size: clamp(20px, 3vw, 26px); font-weight: 800; letter-spacing: -0.025em; margin-bottom: 6px; }
+.cta-sub { font-size: 13.5px; color: var(--txt2); max-width: 480px; margin: 0 auto 20px; line-height: 1.55; }
 
 /* ── Footer ── */
 footer {
-  border-top: 1px solid var(--brd); padding: 36px 24px; text-align: center;
-  color: var(--muted); font-size: 12px; position: relative; z-index: 2;
+  border-top: 1px solid var(--brd); padding: 24px 20px; text-align: center;
+  color: var(--muted); font-size: 11.5px; position: relative; z-index: 2;
 }
 .footer-inner {
-  max-width: 1200px; margin: 0 auto; display: flex; align-items: center;
-  justify-content: space-between; flex-wrap: wrap; gap: 16px;
+  max-width: 1060px; margin: 0 auto; display: flex; align-items: center;
+  justify-content: space-between; flex-wrap: wrap; gap: 12px;
 }
-.footer-links { display: flex; gap: 20px; }
+.footer-links { display: flex; gap: 16px; }
 .footer-link { color: var(--muted); text-decoration: none; transition: color 0.2s; }
 .footer-link:hover { color: var(--txt2); }
 
 /* Scroll Reveal */
-.reveal { opacity: 0; transform: translateY(22px); transition: opacity 0.7s ease, transform 0.7s ease; }
+.reveal { opacity: 0; transform: translateY(16px); transition: opacity 0.6s ease, transform 0.6s ease; }
 .reveal.visible { opacity: 1; transform: none; }
 </style>
 </head>
@@ -525,7 +476,7 @@ footer {
   <div class="nav-divider"></div>
   <span class="nav-pill">Research Platform v2.0</span>
   <div class="flex1"></div>
-  <nav class="nav-links">
+  <div class="nav-links">
     <span class="nav-link" onclick="replayIntro()">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
       Replay Intro
@@ -534,10 +485,10 @@ footer {
     <a class="nav-link" href="/health">Status</a>
     <a class="nav-link" href="/ui/ide.html">IDE</a>
     <a class="nav-cta" href="/ui/ide.html">
-      <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M2 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M8 12h6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M2 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M8 12h6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
       Launch IDE
     </a>
-  </nav>
+  </div>
 </nav>
 
 <!-- ── Hero ── -->
@@ -557,36 +508,36 @@ footer {
 
   <div class="hero-actions">
     <a class="btn-primary" href="/ui/ide.html">
-      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M8 12h6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M2 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M8 12h6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
       Open Analysis IDE
     </a>
     <a class="btn-ghost" href="/docs">
-      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="2" y="2" width="12" height="12" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M5 6h6M5 9h4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+      <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><rect x="2" y="2" width="12" height="12" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M5 6h6M5 9h4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
       REST API Docs
     </a>
   </div>
 
-  <!-- Sleek Feature Pillar Cards -->
-  <div class="feature-pillars-grid reveal" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:16px; width:100%; max-width:1040px; margin-top:40px;">
-    <div style="background:#0f172a; border:1px solid rgba(6, 182, 212, 0.25); padding:20px; border-radius:8px; text-align:left;">
-      <div style="color:#38bdf8; font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:0.05em; margin-bottom:6px;">AST Code Smells</div>
-      <div style="font-size:14px; font-weight:600; color:#f8fafc; margin-bottom:6px;">Structural Defect Detection</div>
-      <div style="font-size:12px; color:#94a3b8; line-height:1.5;">Identifies Long Methods, Deep Nesting, Large Classes, and Long Parameter Lists before commit.</div>
+  <!-- Sleek Compact Feature Pillar Cards -->
+  <div class="feature-pillars-grid reveal" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:12px; width:100%; max-width:980px; margin-top:20px;">
+    <div style="background:#0f172a; border:1px solid rgba(6, 182, 212, 0.25); padding:16px; border-radius:8px; text-align:left;">
+      <div style="color:#38bdf8; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.04em; margin-bottom:4px;">AST Code Smells</div>
+      <div style="font-size:13px; font-weight:600; color:#f8fafc; margin-bottom:4px;">Structural Defect Detection</div>
+      <div style="font-size:11.5px; color:#94a3b8; line-height:1.5;">Identifies Long Methods, Deep Nesting, Large Classes, and Long Parameter Lists before commit.</div>
     </div>
-    <div style="background:#0f172a; border:1px solid rgba(99, 102, 241, 0.25); padding:20px; border-radius:8px; text-align:left;">
-      <div style="color:#818cf8; font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:0.05em; margin-bottom:6px;">Calibrated ML Prior</div>
-      <div style="font-size:14px; font-weight:600; color:#f8fafc; margin-bottom:6px;">Empirical Defect Risk</div>
-      <div style="font-size:12px; color:#94a3b8; line-height:1.5;">LightGBM / CatBoost model predicting bug-fix probability calibrated against real repositories.</div>
+    <div style="background:#0f172a; border:1px solid rgba(99, 102, 241, 0.25); padding:16px; border-radius:8px; text-align:left;">
+      <div style="color:#818cf8; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.04em; margin-bottom:4px;">Calibrated ML Prior</div>
+      <div style="font-size:13px; font-weight:600; color:#f8fafc; margin-bottom:4px;">Empirical Defect Risk</div>
+      <div style="font-size:11.5px; color:#94a3b8; line-height:1.5;">LightGBM / CatBoost model predicting bug-fix probability calibrated against real repositories.</div>
     </div>
-    <div style="background:#0f172a; border:1px solid rgba(16, 185, 129, 0.25); padding:20px; border-radius:8px; text-align:left;">
-      <div style="color:#34d399; font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:0.05em; margin-bottom:6px;">Polyglot Engine</div>
-      <div style="font-size:14px; font-weight:600; color:#f8fafc; margin-bottom:6px;">Universal Static Telemetry</div>
-      <div style="font-size:12px; color:#94a3b8; line-height:1.5;">Extracts LOC, Cyclomatic Complexity, and Cognitive Load across Python, Java, JS, TS, Go, and Rust.</div>
+    <div style="background:#0f172a; border:1px solid rgba(16, 185, 129, 0.25); padding:16px; border-radius:8px; text-align:left;">
+      <div style="color:#34d399; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.04em; margin-bottom:4px;">Polyglot Engine</div>
+      <div style="font-size:13px; font-weight:600; color:#f8fafc; margin-bottom:4px;">Universal Static Telemetry</div>
+      <div style="font-size:11.5px; color:#94a3b8; line-height:1.5;">Extracts LOC, Cyclomatic Complexity, and Cognitive Load across Python, Java, JS, TS, Go, and Rust.</div>
     </div>
-    <div style="background:#0f172a; border:1px solid rgba(245, 158, 11, 0.25); padding:20px; border-radius:8px; text-align:left;">
-      <div style="color:#fbbf24; font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:0.05em; margin-bottom:6px;">Collaboration</div>
-      <div style="font-size:14px; font-weight:600; color:#f8fafc; margin-bottom:6px;">Real-Time Team Sync</div>
-      <div style="font-size:12px; color:#94a3b8; line-height:1.5;">WebSocket live room relay, synchronized peer editing, and inline code review annotations.</div>
+    <div style="background:#0f172a; border:1px solid rgba(245, 158, 11, 0.25); padding:16px; border-radius:8px; text-align:left;">
+      <div style="color:#fbbf24; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.04em; margin-bottom:4px;">Collaboration</div>
+      <div style="font-size:13px; font-weight:600; color:#f8fafc; margin-bottom:4px;">Real-Time Team Sync</div>
+      <div style="font-size:11.5px; color:#94a3b8; line-height:1.5;">WebSocket live room relay, synchronized peer editing, and inline code review annotations.</div>
     </div>
   </div>
 </section>
@@ -654,85 +605,85 @@ footer {
 </section>
 
 <!-- ── Next-Gen Capabilities / Coming Soon Roadmap ── -->
-<section class="section" style="margin-top:20px;">
-  <div style="display:flex;align-items:center;gap:8px;justify-content:center;margin-bottom:12px;">
-    <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#06b6d4;box-shadow:0 0 12px #06b6d4;animation:pulseDot 2s infinite;"></span>
-    <span style="font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#38bdf8;">Enterprise Innovations · Coming Soon</span>
+<section class="section" style="margin-top:10px;">
+  <div style="display:flex;align-items:center;gap:6px;justify-content:center;margin-bottom:8px;">
+    <span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:#06b6d4;box-shadow:0 0 10px #06b6d4;animation:pulseDot 2s infinite;"></span>
+    <span style="font-size:10px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:#38bdf8;">Enterprise Innovations · Coming Soon</span>
   </div>
   <div class="section-title" style="text-align:center;">Autonomous Defect Prevention Suite</div>
-  <p class="section-sub" style="text-align:center;max-width:640px;margin:0 auto 40px;">
+  <p class="section-sub" style="text-align:center;max-width:560px;margin:0 auto 24px;">
     Upcoming enterprise capabilities engineered to transform static defect prediction into continuous autonomous remediation across multi-cloud repositories.
   </p>
 
-  <div class="roadmap-grid reveal" style="display:grid;grid-template-columns:repeat(auto-fit, minmax(260px, 1fr));gap:20px;max-width:1120px;margin:0 auto;">
+  <div class="roadmap-grid reveal" style="display:grid;grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));gap:12px;max-width:980px;margin:0 auto;">
     
     <!-- Card 1: Autonomous AI Refactoring -->
-    <div class="roadmap-card" style="background:rgba(15,23,42,0.8);backdrop-filter:blur(12px);border:1px solid rgba(6,182,212,0.25);border-radius:12px;padding:24px;position:relative;overflow:hidden;transition:all 0.3s cubic-bezier(0.16,1,0.3,1);" onmouseover="this.style.borderColor='#06b6d4';this.style.transform='translateY(-4px)';this.style.boxShadow='0 12px 30px rgba(6,182,212,0.15)';" onmouseout="this.style.borderColor='rgba(6,182,212,0.25)';this.style.transform='none';this.style.boxShadow='none';">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
-        <div style="width:38px;height:38px;border-radius:8px;background:rgba(6,182,212,0.1);display:flex;align-items:center;justify-content:center;border:1px solid rgba(6,182,212,0.3);">
-          <svg viewBox="0 0 24 24" fill="none" stroke="#06b6d4" stroke-width="2" style="width:20px;height:20px;"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
+    <div class="roadmap-card" style="background:rgba(15,23,42,0.8);backdrop-filter:blur(12px);border:1px solid rgba(6,182,212,0.25);border-radius:8px;padding:16px;position:relative;overflow:hidden;transition:all 0.25s ease;" onmouseover="this.style.borderColor='#06b6d4';this.style.transform='translateY(-2px)';" onmouseout="this.style.borderColor='rgba(6,182,212,0.25)';this.style.transform='none';">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+        <div style="width:30px;height:30px;border-radius:6px;background:rgba(6,182,212,0.1);display:flex;align-items:center;justify-content:center;border:1px solid rgba(6,182,212,0.3);">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#06b6d4" stroke-width="2" style="width:16px;height:16px;"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
         </div>
-        <span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;padding:4px 10px;border-radius:20px;background:rgba(6,182,212,0.15);color:#38bdf8;border:1px solid rgba(6,182,212,0.3);">✦ In Private Beta</span>
+        <span style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.04em;padding:2px 8px;border-radius:12px;background:rgba(6,182,212,0.15);color:#38bdf8;border:1px solid rgba(6,182,212,0.3);">✦ Private Beta</span>
       </div>
-      <div style="font-size:16px;font-weight:700;color:#f8fafc;margin-bottom:8px;">Autonomous AI Refactoring PRs</div>
-      <div style="font-size:13px;color:#94a3b8;line-height:1.6;margin-bottom:20px;">
-        One-click automated Pull Requests that decompose God Methods, simplify deeply nested loops, and rewrite high-risk AST branches while preserving 100% test coverage.
+      <div style="font-size:14px;font-weight:700;color:#f8fafc;margin-bottom:6px;">Autonomous AI Refactoring</div>
+      <div style="font-size:12px;color:#94a3b8;line-height:1.5;margin-bottom:14px;">
+        One-click automated Pull Requests that decompose God Methods and simplify deeply nested loops while preserving full test coverage.
       </div>
-      <div style="display:flex;align-items:center;justify-content:space-between;padding-top:14px;border-top:1px solid rgba(255,255,255,0.06);font-size:11px;color:#64748b;">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding-top:10px;border-top:1px solid rgba(255,255,255,0.06);font-size:10.5px;color:#64748b;">
         <span>Readiness</span>
         <span style="color:#06b6d4;font-weight:700;">85% Completed</span>
       </div>
     </div>
 
     <!-- Card 2: CI/CD Quality Gatekeeper -->
-    <div class="roadmap-card" style="background:rgba(15,23,42,0.8);backdrop-filter:blur(12px);border:1px solid rgba(99,102,241,0.25);border-radius:12px;padding:24px;position:relative;overflow:hidden;transition:all 0.3s cubic-bezier(0.16,1,0.3,1);" onmouseover="this.style.borderColor='#818cf8';this.style.transform='translateY(-4px)';this.style.boxShadow='0 12px 30px rgba(99,102,241,0.15)';" onmouseout="this.style.borderColor='rgba(99,102,241,0.25)';this.style.transform='none';this.style.boxShadow='none';">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
-        <div style="width:38px;height:38px;border-radius:8px;background:rgba(99,102,241,0.1);display:flex;align-items:center;justify-content:center;border:1px solid rgba(99,102,241,0.3);">
-          <svg viewBox="0 0 24 24" fill="none" stroke="#818cf8" stroke-width="2" style="width:20px;height:20px;"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+    <div class="roadmap-card" style="background:rgba(15,23,42,0.8);backdrop-filter:blur(12px);border:1px solid rgba(99,102,241,0.25);border-radius:8px;padding:16px;position:relative;overflow:hidden;transition:all 0.25s ease;" onmouseover="this.style.borderColor='#818cf8';this.style.transform='translateY(-2px)';" onmouseout="this.style.borderColor='rgba(99,102,241,0.25)';this.style.transform='none';">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+        <div style="width:30px;height:30px;border-radius:6px;background:rgba(99,102,241,0.1);display:flex;align-items:center;justify-content:center;border:1px solid rgba(99,102,241,0.3);">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#818cf8" stroke-width="2" style="width:16px;height:16px;"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
         </div>
-        <span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;padding:4px 10px;border-radius:20px;background:rgba(99,102,241,0.15);color:#a5b4fc;border:1px solid rgba(99,102,241,0.3);">✦ Coming Soon</span>
+        <span style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.04em;padding:2px 8px;border-radius:12px;background:rgba(99,102,241,0.15);color:#a5b4fc;border:1px solid rgba(99,102,241,0.3);">✦ Coming Soon</span>
       </div>
-      <div style="font-size:16px;font-weight:700;color:#f8fafc;margin-bottom:8px;">GitHub Actions CI/CD Gate</div>
-      <div style="font-size:13px;color:#94a3b8;line-height:1.6;margin-bottom:20px;">
-        Pre-merge automated status checks that enforce defect probability thresholds, calculate delta maintainability indexes, and prevent regression debt from entering trunk.
+      <div style="font-size:14px;font-weight:700;color:#f8fafc;margin-bottom:6px;">GitHub Actions CI Gate</div>
+      <div style="font-size:12px;color:#94a3b8;line-height:1.5;margin-bottom:14px;">
+        Pre-merge automated status checks that enforce defect probability thresholds and prevent regression debt from entering trunk.
       </div>
-      <div style="display:flex;align-items:center;justify-content:space-between;padding-top:14px;border-top:1px solid rgba(255,255,255,0.06);font-size:11px;color:#64748b;">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding-top:10px;border-top:1px solid rgba(255,255,255,0.06);font-size:10.5px;color:#64748b;">
         <span>Readiness</span>
         <span style="color:#818cf8;font-weight:700;">70% Completed</span>
       </div>
     </div>
 
     <!-- Card 3: Enterprise Fine-Tuning Studio -->
-    <div class="roadmap-card" style="background:rgba(15,23,42,0.8);backdrop-filter:blur(12px);border:1px solid rgba(16,185,129,0.25);border-radius:12px;padding:24px;position:relative;overflow:hidden;transition:all 0.3s cubic-bezier(0.16,1,0.3,1);" onmouseover="this.style.borderColor='#10b981';this.style.transform='translateY(-4px)';this.style.boxShadow='0 12px 30px rgba(16,185,129,0.15)';" onmouseout="this.style.borderColor='rgba(16,185,129,0.25)';this.style.transform='none';this.style.boxShadow='none';">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
-        <div style="width:38px;height:38px;border-radius:8px;background:rgba(16,185,129,0.1);display:flex;align-items:center;justify-content:center;border:1px solid rgba(16,185,129,0.3);">
-          <svg viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" style="width:20px;height:20px;"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+    <div class="roadmap-card" style="background:rgba(15,23,42,0.8);backdrop-filter:blur(12px);border:1px solid rgba(16,185,129,0.25);border-radius:8px;padding:16px;position:relative;overflow:hidden;transition:all 0.25s ease;" onmouseover="this.style.borderColor='#10b981';this.style.transform='translateY(-2px)';" onmouseout="this.style.borderColor='rgba(16,185,129,0.25)';this.style.transform='none';">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+        <div style="width:30px;height:30px;border-radius:6px;background:rgba(16,185,129,0.1);display:flex;align-items:center;justify-content:center;border:1px solid rgba(16,185,129,0.3);">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" style="width:16px;height:16px;"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
         </div>
-        <span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;padding:4px 10px;border-radius:20px;background:rgba(16,185,129,0.15);color:#6ee7b7;border:1px solid rgba(16,185,129,0.3);">✦ In Development</span>
+        <span style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.04em;padding:2px 8px;border-radius:12px;background:rgba(16,185,129,0.15);color:#6ee7b7;border:1px solid rgba(16,185,129,0.3);">✦ In Progress</span>
       </div>
-      <div style="font-size:16px;font-weight:700;color:#f8fafc;margin-bottom:8px;">Custom Model Fine-Tuning</div>
-      <div style="font-size:13px;color:#94a3b8;line-height:1.6;margin-bottom:20px;">
-        Train proprietary LightGBM / CatBoost estimators calibrated against your internal git history, company-specific architectural patterns, and private commit dynamics.
+      <div style="font-size:14px;font-weight:700;color:#f8fafc;margin-bottom:6px;">Custom Model Fine-Tuning</div>
+      <div style="font-size:12px;color:#94a3b8;line-height:1.5;margin-bottom:14px;">
+        Train proprietary LightGBM estimators calibrated against your internal git history and company architectural patterns.
       </div>
-      <div style="display:flex;align-items:center;justify-content:space-between;padding-top:14px;border-top:1px solid rgba(255,255,255,0.06);font-size:11px;color:#64748b;">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding-top:10px;border-top:1px solid rgba(255,255,255,0.06);font-size:10.5px;color:#64748b;">
         <span>Readiness</span>
         <span style="color:#10b981;font-weight:700;">60% Completed</span>
       </div>
     </div>
 
     <!-- Card 4: Multi-Repo Dependency Graph -->
-    <div class="roadmap-card" style="background:rgba(15,23,42,0.8);backdrop-filter:blur(12px);border:1px solid rgba(245,158,11,0.25);border-radius:12px;padding:24px;position:relative;overflow:hidden;transition:all 0.3s cubic-bezier(0.16,1,0.3,1);" onmouseover="this.style.borderColor='#f59e0b';this.style.transform='translateY(-4px)';this.style.boxShadow='0 12px 30px rgba(245,158,11,0.15)';" onmouseout="this.style.borderColor='rgba(245,158,11,0.25)';this.style.transform='none';this.style.boxShadow='none';">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
-        <div style="width:38px;height:38px;border-radius:8px;background:rgba(245,158,11,0.1);display:flex;align-items:center;justify-content:center;border:1px solid rgba(245,158,11,0.3);">
-          <svg viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2" style="width:20px;height:20px;"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+    <div class="roadmap-card" style="background:rgba(15,23,42,0.8);backdrop-filter:blur(12px);border:1px solid rgba(245,158,11,0.25);border-radius:8px;padding:16px;position:relative;overflow:hidden;transition:all 0.25s ease;" onmouseover="this.style.borderColor='#f59e0b';this.style.transform='translateY(-2px)';" onmouseout="this.style.borderColor='rgba(245,158,11,0.25)';this.style.transform='none';">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+        <div style="width:30px;height:30px;border-radius:6px;background:rgba(245,158,11,0.1);display:flex;align-items:center;justify-content:center;border:1px solid rgba(245,158,11,0.3);">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2" style="width:16px;height:16px;"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
         </div>
-        <span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;padding:4px 10px;border-radius:20px;background:rgba(245,158,11,0.15);color:#fcd34d;border:1px solid rgba(245,158,11,0.3);">✦ Planned</span>
+        <span style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.04em;padding:2px 8px;border-radius:12px;background:rgba(245,158,11,0.15);color:#fcd34d;border:1px solid rgba(245,158,11,0.3);">✦ Planned</span>
       </div>
-      <div style="font-size:16px;font-weight:700;color:#f8fafc;margin-bottom:8px;">Cross-Repo Semantic Graphs</div>
-      <div style="font-size:13px;color:#94a3b8;line-height:1.6;margin-bottom:20px;">
-        Interactive 3D dependency visualization linking upstream microservices, shared API contracts, and cross-package co-change risk blast radiuses.
+      <div style="font-size:14px;font-weight:700;color:#f8fafc;margin-bottom:6px;">Cross-Repo Semantic Graphs</div>
+      <div style="font-size:12px;color:#94a3b8;line-height:1.5;margin-bottom:14px;">
+        Interactive dependency visualization linking upstream microservices, shared API contracts, and co-change risk blast radiuses.
       </div>
-      <div style="display:flex;align-items:center;justify-content:space-between;padding-top:14px;border-top:1px solid rgba(255,255,255,0.06);font-size:11px;color:#64748b;">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding-top:10px;border-top:1px solid rgba(255,255,255,0.06);font-size:10.5px;color:#64748b;">
         <span>Readiness</span>
         <span style="color:#f59e0b;font-weight:700;">Design Phase</span>
       </div>
@@ -742,11 +693,11 @@ footer {
 </section>
 
 <!-- ── IDE CTA ── -->
-<div class="cta-band reveal" style="margin-top:60px;">
+<div class="cta-band reveal">
   <div class="cta-title">Interactive Analysis IDE</div>
   <p class="cta-sub">Open the full collaborative Monaco IDE with real-time smell detection, causal metrics breakdown, and empirical defect risk intelligence.</p>
   <a class="btn-primary" href="/ui/ide.html">
-    <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M8 12h6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+    <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M2 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M8 12h6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
     Launch IDE Workspace
   </a>
 </div>
