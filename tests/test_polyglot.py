@@ -65,7 +65,8 @@ class TestJavaSmellDetection:
         assert res.metrics.max_param_count >= 5
         assert res.smells.has_deep_nesting == 1
         assert res.smells.has_long_param_list == 1
-        assert res.risk_probability > 0.3
+        assert res.is_ml_prediction is False
+        assert res.risk_probability == 0.0
 
 
 class TestKotlinSmellDetection:
@@ -197,7 +198,8 @@ class TestLiveApiPolyglotRouting:
         data = response.json()
         assert data["language"] == "typescript"
         assert "🔷 TypeScript" in data.get("language_badge", "")
-        assert data["risk"]["tier"] in ("Low", "Medium", "High", "Critical")
+        assert data["is_ml_prediction"] is False
+        assert data["risk"] is None
 
     def test_live_analyze_python_file(self):
         payload = {

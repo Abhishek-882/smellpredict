@@ -511,6 +511,35 @@ async def get_model_info():
     }
 
 
+class QuickFixRequest(BaseModel):
+    content: str = Field(..., description="Source code content")
+    filename: str = Field(default="untitled.py", description="Filename or path")
+    smell_type: str = Field(..., description="Code smell type (e.g. LongMethod, DeepNesting)")
+    line_number: int = Field(default=1, description="Line number of detected smell")
+    target_name: str = Field(default="", description="Function/class name target")
+
+
+@app.post(
+    "/api/v1/refactor/quick-fix",
+    tags=["Refactoring"],
+    summary="Generate automated quick-fix refactoring patch and unified diff",
+)
+async def quick_fix_endpoint(body: QuickFixRequest):
+    """Generate an automated quick-fix refactoring patch and unified diff."""
+    from smellpredict.features.refactor import generate_quick_fix_patch
+    from smellpredict.features.polyglot import EXTENSION_MAP
+    ext = Path(body.filename).suffix.lower()
+    lang = EXTENSION_MAP.get(ext, "python")
+    patch = generate_quick_fix_patch(
+        source_code=body.content,
+        smell_type=body.smell_type,
+        line_number=body.line_number,
+        language=lang,
+        target_name=body.target_name,
+    )
+    return JSONResponse(patch)
+
+
 
 
 @app.get("/api/v1/java/mining-progress", tags=["Java Pipeline"])
